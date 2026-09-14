@@ -20,9 +20,9 @@ def combination(n, r):
         combination_dict[(n, r)] = ans
         return ans
 
-class Skill:
-    def __init__(self, base_power, coin_count, coin_power):
+class NormalCoinSkill:
+    def __init__(self, base_power, coin_count, coin_power, sanity):
         self.base_power = base_power
         self.coin_count = coin_count
         self.coin_power = coin_power
-
+        self.sanity = sanity
