@@ -37,6 +37,7 @@ def get_power_probabilities(skill):
         tail_count = skill.coin_count - head_count
 
         power = skill.base_power + skill.coin_power * head_count
+        power = max(power, 0)
         probability = heads_probability ** head_count * tails_probability ** tail_count * combination(skill.coin_count, head_count)
         result[power] = probability
 
