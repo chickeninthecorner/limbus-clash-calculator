@@ -26,8 +26,14 @@ class NormalCoinSkill:
         self.coin_count = coin_count
         self.coin_power = coin_power
         self.sanity = sanity
+        self.id = (base_power, coin_count, coin_power, sanity)
+
+power_probabilities_dict = {}
 
 def get_power_probabilities(skill):
+    if skill.id in power_probabilities_dict:
+        return power_probabilities_dict[skill.id]
+
     heads_probability = skill.sanity / 100 + 0.5
     tails_probability = 1 - heads_probability
 
@@ -41,9 +47,16 @@ def get_power_probabilities(skill):
         probability = heads_probability ** head_count * tails_probability ** tail_count * combination(skill.coin_count, head_count)
         result[power] = probability
 
+    power_probabilities_dict[skill.id] = result
     return result
 
+winner_probabilities_dict = {}
+
 def get_winner_probabilities(skill1, skill2):
+    key = (skill1.id, skill2.id)
+    if key in winner_probabilities_dict:
+        return winner_probabilities_dict[key]
+
     power_probabilities1 = get_power_probabilities(skill1)
     power_probabilities2 = get_power_probabilities(skill2)
 
@@ -63,4 +76,13 @@ def get_winner_probabilities(skill1, skill2):
             else:
                 tie_probability += combined_probability
 
-    return win_probability, tie_probability, lose_probability
+
+    result = win_probability, tie_probability, lose_probability
+    winner_probabilities_dict[key] = result
+    return result
+
+skill1 = NormalCoinSkill(1, 2, 1, 25)
+skill2 = NormalCoinSkill(1, 2, 1, 0)
+
+print(get_winner_probabilities(skill1, skill2))
+print('test')
