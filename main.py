@@ -26,3 +26,22 @@ class NormalCoinSkill:
         self.coin_count = coin_count
         self.coin_power = coin_power
         self.sanity = sanity
+
+def get_power_probabilities(skill):
+    heads_probability = skill.sanity / 100 + 0.5
+    tails_probability = 1 - heads_probability
+
+    result = {}
+
+    for head_count in range(0, skill.coin_count + 1):
+        tail_count = skill.coin_count - head_count
+
+        power = skill.base_power + skill.coin_power * head_count
+        probability = heads_probability ** head_count * tails_probability ** tail_count * combination(skill.coin_count, head_count)
+        result[power] = probability
+
+    return result
+
+skill1 = NormalCoinSkill(1, 2, 1, 25)
+r = get_power_probabilities(skill1)
+print(r)
