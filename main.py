@@ -43,6 +43,24 @@ def get_power_probabilities(skill):
 
     return result
 
-skill1 = NormalCoinSkill(1, 2, 1, 25)
-r = get_power_probabilities(skill1)
-print(r)
+def get_winner_probabilities(skill1, skill2):
+    power_probabilities1 = get_power_probabilities(skill1)
+    power_probabilities2 = get_power_probabilities(skill2)
+
+    win_probability = 0
+    tie_probability = 0
+    lose_probability = 0
+    for power1 in power_probabilities1:
+        power1_probability = power_probabilities1[power1]
+        for power2 in power_probabilities2:
+            power2_probability = power_probabilities2[power2]
+
+            combined_probability = power1_probability * power2_probability
+            if power1 > power2:
+                win_probability += combined_probability
+            elif power1 < power2:
+                lose_probability += combined_probability
+            else:
+                tie_probability += combined_probability
+
+    return win_probability, tie_probability, lose_probability
