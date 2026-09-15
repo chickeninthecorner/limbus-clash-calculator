@@ -127,9 +127,9 @@ combined_power_probabilities_dict = {}
 def get_combined_power_probabilities(
 	power_probabilities1, power_probabilities2
 ):
-	key = (power_probabilities1.items(), power_probabilities2.items())
+	key = (frozenset(power_probabilities1.items()), frozenset(power_probabilities2.items()))
 	if key in combined_power_probabilities_dict:
-		return combined_power_probabilities_dict(key)
+		return combined_power_probabilities_dict[key]
 
 	result = {}
 
@@ -156,7 +156,6 @@ def get_power_probabilities(skill):
 		return power_probabilities_dict[skill.effective_dynamic_id]
 	elif skill.paralysis >= skill.coin_count:
 		effective_coin_power = 0
-		print(skill)
 	elif skill.paralysis > 0:
 		divided_skills = get_divided_skill(skill)
 		
@@ -275,7 +274,7 @@ def clash(skill1, skill2, parry):
 	return result
 
 
-skill1 = BasicSkill(1, 1, 1, 0)
-skill2 = BasicSkill(1, 1, 1, 0)
+skill1 = BasicSkill(1, 20, 1, 0, 10)
+skill2 = BasicSkill(1, 20, 1, 0, 10)
 print(clash(skill1, skill2, 0))
 print(len(clash_dict))
