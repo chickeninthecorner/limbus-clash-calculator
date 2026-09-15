@@ -124,7 +124,7 @@ combined_power_probabilities_dict = {}
 def get_combined_power_probabilities(
 	power_probabilities1, power_probabilities2
 ):
-	key = (power_probabilities1, power_probabilities2)
+	key = (power_probabilities1.items(), power_probabilities2.items())
 	if key in combined_power_probabilities_dict:
 		return combined_power_probabilities_dict(key)
 
@@ -141,7 +141,7 @@ def get_combined_power_probabilities(
 
 			result[combined_power] = combined_probability
 
-	combined_power_probabilities_dict[key] = combined_probability
+	combined_power_probabilities_dict[key] = result
 	return result
 
 
