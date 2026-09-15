@@ -28,7 +28,10 @@ class NormalCoinSkill:
         self.coin_count = coin_count
         self.coin_power = coin_power
         self.sanity = sanity
-        self.id = (base_power, coin_count, coin_power, sanity)
+    
+    @property
+    def id(self):
+        return (self.base_power, self.coin_count, self.coin_power, self.sanity)
 
 power_probabilities_dict = {}
 
@@ -54,7 +57,7 @@ def get_power_probabilities(skill):
 
 outcome_probabilities_dict = {}
 
-def get_winner_probabilities(skill1, skill2):
+def get_parry_outcome_probabilities(skill1, skill2):
     key = (skill1.id, skill2.id)
     if key in outcome_probabilities_dict:
         return outcome_probabilities_dict[key]
@@ -62,9 +65,7 @@ def get_winner_probabilities(skill1, skill2):
     power_probabilities1 = get_power_probabilities(skill1)
     power_probabilities2 = get_power_probabilities(skill2)
 
-    win_probability = 0
-    tie_probability = 0
-    lose_probability = 0
+    result = {"win": 0.0, "tie": 0.0, "lose": 0.0}
     for power1 in power_probabilities1:
         power1_probability = power_probabilities1[power1]
         for power2 in power_probabilities2:
@@ -72,13 +73,51 @@ def get_winner_probabilities(skill1, skill2):
 
             combined_probability = power1_probability * power2_probability
             if power1 > power2:
-                win_probability += combined_probability
+                result["win"] += combined_probability
             elif power1 < power2:
-                lose_probability += combined_probability
+                result["lose"] += combined_probability
             else:
-                tie_probability += combined_probability
+                result["tie"] += combined_probability
 
-
-    result = {"win": win_probability, "tie": tie_probability, "lose": lose_probability}
     outcome_probabilities_dict[key] = result
     return result
+
+clash_dict = {}
+
+def clash(skill1, skill2, parry):
+	
+	key = (skill1.id, skill2.id, parry)
+	if key in clash_dict:
+		return clash_dict[key]
+	
+	result = {"win": 0.0, "tie": 0.0, "lose": 0.0}
+	if skill2.coin_count == 0:
+		result["win"] = 1.0
+		return result
+	elif skill1.coin_count == 0:
+		result["lose"] = 1.0
+		return result
+	elif parry == 99:
+		result["tie"] = 1.0
+		return result
+	
+	parry_outcome_probabilities = get_parry_outcome_probabilities(skill1, skill2)
+
+	skill2_lose = copy.copy(skill2)
+	skill2_lose.coin_count -= 1
+	parry_win_clash_outcomes = clash(skill1, skill2_lose, parry + 1)
+	skill1_lose = copy.copy(skill1) 
+	skill1_lose.coin_count -= 1
+	parry_lose_clash_outcomes = clash(skill1_lose, skill2, parry + 1)
+	parry_tie_clash_outcomes = clash(skill1, skill2, parry + 1)
+	 
+	result["win"] = parry_outcome_probabilities["win"] * parry_win_clash_outcomes["win"]  + parry_outcome_probabilities["tie"] * parry_tie_clash_outcomes["win"] + parry_outcome_probabilities["lose"] * parry_lose_clash_outcomes["win"]
+	result["tie"] = parry_outcome_probabilities["win"] * parry_win_clash_outcomes["tie"]  + parry_outcome_probabilities["tie"] * parry_tie_clash_outcomes["tie"] + parry_outcome_probabilities["lose"] * parry_lose_clash_outcomes["tie"]
+	result["lose"] = parry_outcome_probabilities["win"] * parry_win_clash_outcomes["lose"]  + parry_outcome_probabilities["tie"] * parry_tie_clash_outcomes["lose"] + parry_outcome_probabilities["lose"] * parry_lose_clash_outcomes["lose"]
+	 
+	clash_dict[key] = result
+	return result
+
+skill1 = NormalCoinSkill(1, 20, 1, 0)
+skill2 = NormalCoinSkill(1, 20, 1, 0)
+print(clash(skill1, skill2, 0))
