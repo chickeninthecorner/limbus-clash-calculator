@@ -247,10 +247,22 @@ def clash(skill1, skill2, parry):
 		skill1, skill2
 	)
 
-	parry_win_clash_outcomes = clash(skill1.next_skill, skill2.lose_skill, parry + 1)
-	parry_lose_clash_outcomes = clash(skill1.lose_skill, skill2.next_skill, parry + 1)
-	parry_tie_clash_outcomes = clash(skill1.next_skill, skill2.next_skill, parry + 1)
+	if parry_outcome_probabilities["win"] == 0.0:
+		parry_win_clash_outcomes = {"win": 0.0, "tie": 0.0, "lose": 0.0}
+	else:
+		parry_win_clash_outcomes = clash(skill1.next_skill, skill2.lose_skill, parry + 1)
 
+	if parry_outcome_probabilities["lose"] == 0.0:
+		parry_lose_clash_outcomes = {"win": 0.0, "tie": 0.0, "lose": 0.0}
+	else:
+		parry_lose_clash_outcomes = clash(skill1.lose_skill, skill2.next_skill, parry + 1)
+
+	if parry_outcome_probabilities["tie"] == 0.0:
+		parry_tie_clash_outcomes = {"win": 0.0, "tie": 0.0, "lose": 0.0}
+	else:
+		parry_tie_clash_outcomes = clash(skill1.next_skill, skill2.next_skill, parry + 1)
+
+	
 	result["win"] = (
 		parry_outcome_probabilities["win"] * parry_win_clash_outcomes["win"]
 		+ parry_outcome_probabilities["tie"] * parry_tie_clash_outcomes["win"]
@@ -274,7 +286,7 @@ def clash(skill1, skill2, parry):
 	return result
 
 
-skill1 = BasicSkill(1, 20, 1, 0, 10)
-skill2 = BasicSkill(1, 20, 1, 0, 10)
+skill1 = BasicSkill(1, 20, 1, 0, 300)
+skill2 = BasicSkill(1, 20, 1, 0, 300)
 print(clash(skill1, skill2, 0))
 print(len(clash_dict))
