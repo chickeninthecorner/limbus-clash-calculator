@@ -73,6 +73,9 @@ class BasicSkill:
 		result.paralysis = max(self.paralysis - self.coin_count, 0)
 		return result
 
+	def __str__(self):
+		return f"{self.base_power}+{self.coin_power}x{self.coin_count} at {self.sanity} SP and {self.paralysis} paralysis"
+
 
 def get_divided_skill(skill):
 	# divides a skill into paralyzed and non paralyzed coins if possible
@@ -139,7 +142,7 @@ def get_combined_power_probabilities(
 			if combined_power not in result:
 				result[combined_power] = 0.0
 
-			result[combined_power] = combined_probability
+			result[combined_power] += combined_probability
 
 	combined_power_probabilities_dict[key] = result
 	return result
@@ -151,6 +154,21 @@ power_probabilities_dict = {}
 def get_power_probabilities(skill):
 	if skill.effective_dynamic_id in power_probabilities_dict:
 		return power_probabilities_dict[skill.effective_dynamic_id]
+	elif skill.paralysis >= skill.coin_count:
+		effective_coin_power = 0
+		print(skill)
+	elif skill.paralysis > 0:
+		divided_skills = get_divided_skill(skill)
+		
+		power_probabilities = []
+		for skill in divided_skills:
+			power_probabilities.append(get_power_probabilities(skill))
+
+		combined_power_probabilities = power_probabilities[0]
+		for i in range(1, len(power_probabilities)):
+			combined_power_probabilities = get_combined_power_probabilities(combined_power_probabilities, power_probabilities[i])
+
+		return combined_power_probabilities
 	else:
 		effective_coin_power = skill.coin_power
 
@@ -169,7 +187,10 @@ def get_power_probabilities(skill):
 			* tails_probability**tail_count
 			* combination(skill.coin_count, head_count)
 		)
-		result[power] = probability
+		if power not in result:
+			result[power] = 0.0
+
+		result[power] += probability
 
 	power_probabilities_dict[skill.effective_dynamic_id] = result
 	return result
@@ -254,7 +275,7 @@ def clash(skill1, skill2, parry):
 	return result
 
 
-skill1 = BasicSkill(1, 50, 1, 45)
-skill2 = BasicSkill(1, 50, 1, 45)
+skill1 = BasicSkill(1, 1, 1, 0)
+skill2 = BasicSkill(1, 1, 1, 0)
 print(clash(skill1, skill2, 0))
 print(len(clash_dict))
