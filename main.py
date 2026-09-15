@@ -1,3 +1,5 @@
+import copy
+
 factorial_dict = {}
 
 def factorial(x):
@@ -50,12 +52,12 @@ def get_power_probabilities(skill):
     power_probabilities_dict[skill.id] = result
     return result
 
-winner_probabilities_dict = {}
+outcome_probabilities_dict = {}
 
 def get_winner_probabilities(skill1, skill2):
     key = (skill1.id, skill2.id)
-    if key in winner_probabilities_dict:
-        return winner_probabilities_dict[key]
+    if key in outcome_probabilities_dict:
+        return outcome_probabilities_dict[key]
 
     power_probabilities1 = get_power_probabilities(skill1)
     power_probabilities2 = get_power_probabilities(skill2)
@@ -77,12 +79,6 @@ def get_winner_probabilities(skill1, skill2):
                 tie_probability += combined_probability
 
 
-    result = win_probability, tie_probability, lose_probability
-    winner_probabilities_dict[key] = result
+    result = {"win": win_probability, "tie": tie_probability, "lose": lose_probability}
+    outcome_probabilities_dict[key] = result
     return result
-
-skill1 = NormalCoinSkill(1, 2, 1, 25)
-skill2 = NormalCoinSkill(1, 2, 1, 0)
-
-print(get_winner_probabilities(skill1, skill2))
-print('test')
