@@ -26,7 +26,7 @@ def combination(n, r):
 		return ans
 
 
-class BasicSkill:
+class Skill:
 	def __init__(
 		self, base_power, coin_count, coin_power, sanity, paralysis=0
 	):
@@ -45,7 +45,7 @@ class BasicSkill:
 		return (
 			self.base_power,
 			self.coin_count,
-			self.coin_power,
+			self.coin_power, 
 			self.sanity,
 			self.paralysis,
 		)
@@ -83,15 +83,15 @@ def get_divided_skill(skill):
 	state = {}
 
 	result = []
-	result.append(BasicSkill(skill.base_power, 1, 0, 0, -50))
+	result.append(Skill(skill.base_power, 1, 0, 0, -50))
 	consecutive_coins = 0
 
 	def append_skill():
 		if state["paralyzed"]:
-			result.append(BasicSkill(0, consecutive_coins, 0, -50))
+			result.append(Skill(0, consecutive_coins, 0, -50))
 		else:
 			result.append(
-				BasicSkill(
+				Skill(
 					0, consecutive_coins, skill.coin_power, skill.sanity
 				)
 			)
@@ -286,7 +286,7 @@ def clash(skill1, skill2, parry):
 	return result
 
 
-skill1 = BasicSkill(1, 20, 1, 0, 300)
-skill2 = BasicSkill(1, 20, 1, 0, 300)
+skill1 = Skill(1, 20, 1, 0, 300)
+skill2 = Skill(1, 20, 1, 0, 300)
 print(clash(skill1, skill2, 0))
 print(len(clash_dict))
