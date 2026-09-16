@@ -28,10 +28,11 @@ def combination(n, r):
 
 class Skill:
 	def __init__(
-		self, base_power, coin_count, coin_power, sanity, paralysis=0
+		self, base_power, coins, coin_power, sanity, paralysis=0
 	):
 		self._base_power = base_power
-		self._coin_count = coin_count
+		self._coins = coins
+		self._coin_count = len(coins)
 		self._coin_power = coin_power
 		self._sanity = sanity
 		self._paralysis = paralysis
@@ -40,6 +41,10 @@ class Skill:
 	def base_power(self):
 		return self._base_power
 
+	@property
+	def coins(self):
+		return self._coins
+	
 	@property
 	def coin_count(self):
 		return self._coin_count
@@ -91,7 +96,7 @@ class Skill:
 	@property
 	def lose_skill(self):
 		return Skill(self.base_power,
-					self.coin_count - 1,
+					tuple(list(self.coins)[:-1]),
 					self.coin_power,
 					self.sanity,
 					max(self.paralysis - self.coin_count, 0))
@@ -99,13 +104,13 @@ class Skill:
 	@property
 	def next_skill(self):
 		return Skill(self.base_power,
-					self.coin_count,
+					self.coins,
 					self.coin_power,
 					self.sanity,
 					max(self.paralysis - self.coin_count, 0))
 
 	def __str__(self):
-		return f"{self.base_power}+{self.coin_power}x{self.coin_count} at {self.sanity} SP and {self.paralysis} paralysis"
+		return f"{self.base_power}+{self.coin_power}x{self.coins} at {self.sanity} SP and {self.paralysis} paralysis"
 
 
 def get_divided_skill(skill):
@@ -114,16 +119,16 @@ def get_divided_skill(skill):
 	state = {}
 
 	result = []
-	result.append(Skill(skill.base_power, 1, 0, 0, -50))
+	result.append(Skill(skill.base_power, ('N',), 0, 0, -50))
 	consecutive_coins = 0
 
 	def append_skill():
 		if state["paralyzed"]:
-			result.append(Skill(0, consecutive_coins, 0, -50))
+			result.append(Skill(0, ('N',) * consecutive_coins, 0, -50))
 		else:
 			result.append(
 				Skill(
-					0, consecutive_coins, skill.coin_power, skill.sanity
+					0, ('N',) * consecutive_coins, skill.coin_power, skill.sanity
 				)
 			)
 
@@ -314,8 +319,8 @@ def clash(skill1, skill2, parry):
 
 import time
 start_time = time.time()
-skill1 = Skill(1, 20, 1, 0, 300)
-skill2 = Skill(1, 20, 1, 0, 300)
+skill1 = Skill(2, ('N',) * 1, 1, 0, 0)
+skill2 = Skill(2, ('N',) * 1, 1, 0, 0)
 print(clash(skill1, skill2, 0))
 print("Unique Clashes:", len(clash_dict))
 print("--- %s seconds ---" % (time.time() - start_time))
