@@ -57,6 +57,14 @@ class Skill:
 		return self._paralysis
 
 	@property
+	def divisible(self):
+		if self.base_power > 0 and self.coin_power > 0:
+			return True
+		if self.paralysis > 0:
+			return True
+		return False
+
+	@property
 	def static_id(self):
 		return (self.base_power, self.coin_count, self.coin_power, self.sanity)
 
@@ -101,7 +109,7 @@ class Skill:
 
 
 def get_divided_skill(skill):
-	# divides a skill into paralyzed and non paralyzed coins if possible
+	# divides a skill into base power, and paralyzed and non paralyzed coins if possible
 	paralysis = skill.paralysis
 	state = {}
 
@@ -177,9 +185,7 @@ power_probabilities_dict = {}
 def get_power_probabilities(skill):
 	if skill.effective_dynamic_id in power_probabilities_dict:
 		return power_probabilities_dict[skill.effective_dynamic_id]
-	elif skill.paralysis >= skill.coin_count:
-		effective_coin_power = 0
-	elif skill.paralysis > 0:
+	elif skill.divisible:
 		divided_skills = get_divided_skill(skill)
 		
 		power_probabilities = []
@@ -191,8 +197,6 @@ def get_power_probabilities(skill):
 			combined_power_probabilities = get_combined_power_probabilities(combined_power_probabilities, power_probabilities[i])
 
 		return combined_power_probabilities
-	else:
-		effective_coin_power = skill.coin_power
 
 	heads_probability = skill.sanity / 100 + 0.5
 	tails_probability = 1 - heads_probability
@@ -202,7 +206,7 @@ def get_power_probabilities(skill):
 	for head_count in range(0, skill.coin_count + 1):
 		tail_count = skill.coin_count - head_count
 
-		power = skill.base_power + effective_coin_power * head_count
+		power = skill.base_power + skill.coin_power * head_count
 		power = max(power, 0)
 		probability = (
 			heads_probability**head_count
@@ -313,5 +317,5 @@ start_time = time.time()
 skill1 = Skill(1, 20, 1, 0, 300)
 skill2 = Skill(1, 20, 1, 0, 300)
 print(clash(skill1, skill2, 0))
-print(len(clash_dict))
+print("Unique Clashes:", len(clash_dict))
 print("--- %s seconds ---" % (time.time() - start_time))
