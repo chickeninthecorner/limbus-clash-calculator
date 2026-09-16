@@ -30,11 +30,31 @@ class Skill:
 	def __init__(
 		self, base_power, coin_count, coin_power, sanity, paralysis=0
 	):
-		self.base_power = base_power
-		self.coin_count = coin_count
-		self.coin_power = coin_power
-		self.sanity = sanity
-		self.paralysis = paralysis
+		self._base_power = base_power
+		self._coin_count = coin_count
+		self._coin_power = coin_power
+		self._sanity = sanity
+		self._paralysis = paralysis
+
+	@property
+	def base_power(self):
+		return self._base_power
+
+	@property
+	def coin_count(self):
+		return self._coin_count
+
+	@property
+	def coin_power(self):
+		return self._coin_power
+
+	@property
+	def sanity(self):
+		return self._sanity
+
+	@property
+	def paralysis(self):
+		return self._paralysis
 
 	@property
 	def static_id(self):
@@ -62,16 +82,19 @@ class Skill:
 
 	@property
 	def lose_skill(self):
-		result = copy.copy(self)
-		result.coin_count -= 1
-		result.paralysis = max(self.paralysis - self.coin_count, 0)
-		return result
+		return Skill(self.base_power,
+					self.coin_count - 1,
+					self.coin_power,
+					self.sanity,
+					max(self.paralysis - self.coin_count, 0))
 
 	@property
 	def next_skill(self):
-		result = copy.copy(self)
-		result.paralysis = max(self.paralysis - self.coin_count, 0)
-		return result
+		return Skill(self.base_power,
+					self.coin_count,
+					self.coin_power,
+					self.sanity,
+					max(self.paralysis - self.coin_count, 0))
 
 	def __str__(self):
 		return f"{self.base_power}+{self.coin_power}x{self.coin_count} at {self.sanity} SP and {self.paralysis} paralysis"
@@ -285,8 +308,10 @@ def clash(skill1, skill2, parry):
 	clash_dict[dynamic_key] = result
 	return result
 
-
+import time
+start_time = time.time()
 skill1 = Skill(1, 20, 1, 0, 300)
 skill2 = Skill(1, 20, 1, 0, 300)
 print(clash(skill1, skill2, 0))
 print(len(clash_dict))
+print("--- %s seconds ---" % (time.time() - start_time))
