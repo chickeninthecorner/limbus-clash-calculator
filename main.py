@@ -28,7 +28,7 @@ def combination(n, r):
 
 class Skill:
 	def __init__(
-		self, base_power, coins, coin_power, sanity, paralysis=0
+		self, base_power, coins, coin_power, sanity=0, paralysis=0
 	):
 		self._base_power = base_power
 		self._coins = coins
@@ -62,32 +62,42 @@ class Skill:
 		return self._paralysis
 
 	@property
-	def divisible(self):
+	def reducible(self):
 		if self.base_power > 0 and self.coin_power > 0:
 			return True
 		if self.paralysis > 0:
+			return True
+		if 'S' in self.coins:
 			return True
 		return False
 
 	@property
 	def static_id(self):
-		return (self.base_power, self.coin_count, self.coin_power, self.sanity)
+		return (self.base_power, self.coins, self.coin_power, self.sanity)
 
 	@property
 	def dynamic_id(self):
 		return (
 			self.base_power,
-			self.coin_count,
+			self.coins,
 			self.coin_power, 
 			self.sanity,
 			self.paralysis,
 		)
 
 	@property
-	def effective_dynamic_id(self):
+	def effective_rolling_id(self):
+		effective_rolling_coins = []
+		for coin in self.coins:
+			if coin == 'C':
+				effective_rolling_coins.append('C')
+			else:
+				effective_rolling_coins.append('N')
+		effective_rolling_coins = tuple(effective_rolling_coins)
+
 		return (
 			self.base_power,
-			self.coin_count,
+			effective_rolling_coins,
 			self.coin_power,
 			self.sanity,
 			min(self.paralysis, self.coin_count),
@@ -95,8 +105,26 @@ class Skill:
 
 	@property
 	def lose_skill(self):
+		coins_after_losing = list(self.coins)
+
+		broken = False
+		for i in range(self.coin_count - 1, 0, -1):
+			if coins_after_losing[i] == 'N':
+				coins_after_losing.pop(i)
+				broken = True
+				break
+			if coins_after_losing[i] == 'R':
+				coins_after_losing[i] = 'C'
+				broken = True
+				break
+
+		if broken:
+			coins_after_losing = tuple(coins_after_losing)
+		else:
+			coins_after_losing = tuple()
+
 		return Skill(self.base_power,
-					tuple(list(self.coins)[:-1]),
+					coins_after_losing,
 					self.coin_power,
 					self.sanity,
 					max(self.paralysis - self.coin_count, 0))
@@ -110,49 +138,42 @@ class Skill:
 					max(self.paralysis - self.coin_count, 0))
 
 	def __str__(self):
-		return f"{self.base_power}+{self.coin_power}x{self.coins} at {self.sanity} SP and {self.paralysis} paralysis"
+		coins_str = ""
+		for coin in self.coins:
+			coins_str += coin
+		return f"{self.base_power} + {self.coin_power} x {coins_str} at {self.sanity} SP and {self.paralysis} paralysis"
 
 
-def get_divided_skill(skill):
-	# divides a skill into base power, and paralyzed and non paralyzed coins if possible
+def get_reduced_rolling_components(skill):
 	paralysis = skill.paralysis
-	state = {}
+	last_effective_coin_power = None
 
 	result = []
-	result.append(Skill(skill.base_power, ('N',), 0, 0, -50))
+	result.append(Skill(skill.base_power, ('N',), 0))
 	consecutive_coins = 0
 
-	def append_skill():
-		if state["paralyzed"]:
-			result.append(Skill(0, ('N',) * consecutive_coins, 0, -50))
-		else:
-			result.append(
-				Skill(
-					0, ('N',) * consecutive_coins, skill.coin_power, skill.sanity
-				)
-			)
-
-	for coin in range(skill.coin_count):
-		new_state = {}
+	for coin in skill.coins:
 		if paralysis > 0:
-			new_state["paralyzed"] = True
+			effective_coin_power = 0
+		elif coin == 'C':
+			effective_coin_power = skill.coin_power // abs(skill.coin_power)
 		else:
-			new_state["paralyzed"] = False
+			effective_coin_power = skill.coin_power
 
-		if state == {}:
-			state = new_state
+		if last_effective_coin_power is None:
+			last_effective_coin_power = effective_coin_power
 			consecutive_coins = 1
-		elif state == new_state:
+		elif last_effective_coin_power == effective_coin_power:
 			consecutive_coins += 1
 		else:
-			append_skill()
+			result.append(Skill(0, ('N',) * consecutive_coins, last_effective_coin_power, skill.sanity))
 
 			consecutive_coins = 1
-			state = new_state
+			last_effective_coin_power = effective_coin_power
 
 		paralysis = max(paralysis - 1, 0)
 
-	append_skill()
+	result.append(Skill(0, ('N',) * consecutive_coins, last_effective_coin_power, skill.sanity))
 
 	return result
 
@@ -188,10 +209,10 @@ power_probabilities_dict = {}
 
 
 def get_power_probabilities(skill):
-	if skill.effective_dynamic_id in power_probabilities_dict:
-		return power_probabilities_dict[skill.effective_dynamic_id]
-	elif skill.divisible:
-		divided_skills = get_divided_skill(skill)
+	if skill.effective_rolling_id in power_probabilities_dict:
+		return power_probabilities_dict[skill.effective_rolling_id]
+	elif skill.reducible:
+		divided_skills = get_reduced_rolling_components(skill)
 		
 		power_probabilities = []
 		for skill in divided_skills:
@@ -223,7 +244,7 @@ def get_power_probabilities(skill):
 
 		result[power] += probability
 
-	power_probabilities_dict[skill.effective_dynamic_id] = result
+	power_probabilities_dict[skill.effective_rolling_id] = result
 	return result
 
 
@@ -231,7 +252,7 @@ outcome_probabilities_dict = {}
 
 
 def get_parry_outcome_probabilities(skill1, skill2):
-	effective_dynamic_key = (skill1.effective_dynamic_id, skill2.effective_dynamic_id)
+	effective_dynamic_key = (skill1.effective_rolling_id, skill2.effective_rolling_id)
 	if effective_dynamic_key in outcome_probabilities_dict:
 		return outcome_probabilities_dict[effective_dynamic_key]
 
@@ -319,8 +340,12 @@ def clash(skill1, skill2, parry):
 
 import time
 start_time = time.time()
-skill1 = Skill(2, ('N',) * 1, 1, 0, 0)
-skill2 = Skill(2, ('N',) * 1, 1, 0, 0)
-print(clash(skill1, skill2, 0))
-print("Unique Clashes:", len(clash_dict))
-print("--- %s seconds ---" % (time.time() - start_time))
+skill1 = Skill(2, tuple(['N', 'R', 'C'] * 3), 2, 0, 3)
+skill2 = Skill(2, tuple(['N', 'N', 'N'] * 3), 2, 0, 3)
+# print(clash(skill1, skill2, 0))
+# print("Unique Clashes:", len(clash_dict))
+# print("--- %s seconds ---" % (time.time() - start_time))
+
+skill1_components = get_reduced_rolling_components(skill1.lose_skill)
+for i in skill1_components:
+	print(i)
