@@ -144,6 +144,73 @@ class Skill:
 		return f"{self.base_power} + {self.coin_power} x {coins_str} at {self.sanity} SP and {self.paralysis} paralysis"
 
 
+class ClashRates:
+	def __init__(self, rates = {}):
+		self._rates = rates
+
+	@property
+	def rates(self):
+		return self._rates
+
+	@property
+	def overall_rate(self):
+		return sum(self.rates.values())
+		
+	def __add__(self, other):
+		result = {}
+		for key, value in self.rates.items():
+			result[key] = value
+		for key, value in other.rates.items():
+			if key not in result:
+				result[key] = value
+			else:
+				result[key] += value
+
+		return ClashRates(result)
+
+	def __mul__(self, other):
+		result = {}
+		for key, value in self.rates.items():
+			result[key] = value * other
+		
+		return ClashRates(result)
+		
+
+class ClashRatesTrio:
+	def __init__(self, win_rates=ClashRates(), tie_rates=ClashRates(), lose_rates=ClashRates()):
+		self._win_rates = win_rates
+		self._tie_rates = tie_rates
+		self._lose_rates = lose_rates
+
+	@property
+	def win_rates(self):
+		return self._win_rates
+
+	@property
+	def tie_rates(self):
+		return self._tie_rates
+
+	@property
+	def lose_rates(self):
+		return self._lose_rates
+
+	@property
+	def overall_rates(self):
+		return (self.win_rates, self.tie_rates, self.lose_rates)
+	
+	def __add__(self, other):
+		return ClashRates(
+			self.win_rates + other.win_rates, 
+			self.tie_rates + other.tie_rates,
+			self.lose_rates + other.lose_rates)
+
+	def __mul__(self, other):
+		return ClashRates(
+			self.win_rates * other.win_rates, 
+			self.tie_rates * other.tie_rates,
+			self.lose_rates * other.lose_rates)
+
+
 def get_reduced_rolling_components(skill):
 	paralysis = skill.paralysis
 	last_effective_coin_power = None
@@ -285,67 +352,53 @@ def clash(skill1, skill2, parry):
 	if dynamic_key in clash_dict:
 		return clash_dict[dynamic_key]
 
-	result = {"win": 0.0, "tie": 0.0, "lose": 0.0}
 	if skill2.coin_count == 0:
-		result["win"] = 1.0
-		return result
+		return ClashRatesTrio(win_rates=ClashRates({skill1.coin_count: 1.0}))
 	elif skill1.coin_count == 0:
-		result["lose"] = 1.0
-		return result
+		return ClashRatesTrio(lose_rates=ClashRates({skill2.coin_count: 1.0}))
 	elif parry == 99:
-		result["tie"] = 1.0
-		return result
+		return ClashRatesTrio(tie_rates=ClashRates({"overall": 1.0}))
 
 	parry_outcome_probabilities = get_parry_outcome_probabilities(
 		skill1, skill2
 	)
 
 	if parry_outcome_probabilities["win"] == 0.0:
-		parry_win_clash_outcomes = {"win": 0.0, "tie": 0.0, "lose": 0.0}
+		parry_win_clash_outcomes = {}
 	else:
 		parry_win_clash_outcomes = clash(skill1.next_skill, skill2.lose_skill, parry + 1)
 
-	if parry_outcome_probabilities["lose"] == 0.0:
-		parry_lose_clash_outcomes = {"win": 0.0, "tie": 0.0, "lose": 0.0}
-	else:
-		parry_lose_clash_outcomes = clash(skill1.lose_skill, skill2.next_skill, parry + 1)
-
 	if parry_outcome_probabilities["tie"] == 0.0:
-		parry_tie_clash_outcomes = {"win": 0.0, "tie": 0.0, "lose": 0.0}
+		parry_tie_clash_outcomes = {}
 	else:
 		parry_tie_clash_outcomes = clash(skill1.next_skill, skill2.next_skill, parry + 1)
 
+	if parry_outcome_probabilities["lose"] == 0.0:
+		parry_lose_clash_outcomes = {}
+	else:
+		parry_lose_clash_outcomes = clash(skill1.lose_skill, skill2.next_skill, parry + 1)
+
+	win_rates = (parry_win_clash_outcomes.win_rates * parry_outcome_probabilities["win"]
+	+ parry_tie_clash_outcomes.win_rates * parry_outcome_probabilities["tie"]
+	+ parry_lose_clash_outcomes.win_rates * parry_outcome_probabilities["lose"])
+
+	tie_rates = (parry_win_clash_outcomes.tie_rates * parry_outcome_probabilities["win"]
+	+ parry_tie_clash_outcomes.tie_rates * parry_outcome_probabilities["tie"]
+	+ parry_lose_clash_outcomes.tie_rates * parry_outcome_probabilities["lose"])
+
+	lose_rates = (parry_win_clash_outcomes.lose_rates * parry_outcome_probabilities["win"]
+	+ parry_tie_clash_outcomes.lose_rates * parry_outcome_probabilities["tie"]
+	+ parry_lose_clash_outcomes.lose_rates * parry_outcome_probabilities["lose"])
 	
-	result["win"] = (
-		parry_outcome_probabilities["win"] * parry_win_clash_outcomes["win"]
-		+ parry_outcome_probabilities["tie"] * parry_tie_clash_outcomes["win"]
-		+ parry_outcome_probabilities["lose"]
-		* parry_lose_clash_outcomes["win"]
-	)
-	result["tie"] = (
-		parry_outcome_probabilities["win"] * parry_win_clash_outcomes["tie"]
-		+ parry_outcome_probabilities["tie"] * parry_tie_clash_outcomes["tie"]
-		+ parry_outcome_probabilities["lose"]
-		* parry_lose_clash_outcomes["tie"]
-	)
-	result["lose"] = (
-		parry_outcome_probabilities["win"] * parry_win_clash_outcomes["lose"]
-		+ parry_outcome_probabilities["tie"] * parry_tie_clash_outcomes["lose"]
-		+ parry_outcome_probabilities["lose"]
-		* parry_lose_clash_outcomes["lose"]
-	)
+	result = ClashRatesTrio(win_rates=win_rates, tie_rates=tie_rates, lose_rates=lose_rates)
 
 	clash_dict[dynamic_key] = result
 	return result
 
 import time
 start_time = time.time()
-skill1 = Skill(2, tuple(['N', 'R', 'C'] * 3), 2, 0, 3)
-skill2 = Skill(2, tuple(['N', 'N', 'N'] * 3), 2, 0, 3)
-# print(clash(skill1, skill2, 0))
-# print("Unique Clashes:", len(clash_dict))
-# print("--- %s seconds ---" % (time.time() - start_time))
-
-skill1_components = get_reduced_rolling_components(skill1.lose_skill)
-for i in skill1_components:
-	print(i)
+skill1 = Skill(2, tuple(['N'] * 5), 2, 0, 0)
+skill2 = Skill(2, tuple(['N'] * 5), 2, 0, 0)
+print(clash(skill1, skill2, 0).win_rates.overall_rate)
+print("Unique Clashes:", len(clash_dict))
+print("--- %s seconds ---" % (time.time() - start_time))
