@@ -151,7 +151,7 @@ class ClashRates:
 	@property
 	def rates(self):
 		return self._rates
-
+		
 	@property
 	def overall_rate(self):
 		return sum(self.rates.values())
@@ -193,10 +193,6 @@ class ClashRatesTrio:
 	@property
 	def lose_rates(self):
 		return self._lose_rates
-
-	@property
-	def overall_rates(self):
-		return (self.win_rates, self.tie_rates, self.lose_rates)
 	
 	def __add__(self, other):
 		return ClashRates(
@@ -364,17 +360,17 @@ def clash(skill1, skill2, parry):
 	)
 
 	if parry_outcome_probabilities["win"] == 0.0:
-		parry_win_clash_outcomes = {}
+		parry_win_clash_outcomes = ClashRatesTrio()
 	else:
 		parry_win_clash_outcomes = clash(skill1.next_skill, skill2.lose_skill, parry + 1)
 
 	if parry_outcome_probabilities["tie"] == 0.0:
-		parry_tie_clash_outcomes = {}
+		parry_tie_clash_outcomes = ClashRatesTrio()
 	else:
 		parry_tie_clash_outcomes = clash(skill1.next_skill, skill2.next_skill, parry + 1)
 
 	if parry_outcome_probabilities["lose"] == 0.0:
-		parry_lose_clash_outcomes = {}
+		parry_lose_clash_outcomes = ClashRatesTrio()
 	else:
 		parry_lose_clash_outcomes = clash(skill1.lose_skill, skill2.next_skill, parry + 1)
 
@@ -394,11 +390,3 @@ def clash(skill1, skill2, parry):
 
 	clash_dict[dynamic_key] = result
 	return result
-
-import time
-start_time = time.time()
-skill1 = Skill(2, tuple(['N'] * 5), 2, 0, 0)
-skill2 = Skill(2, tuple(['N'] * 5), 2, 0, 0)
-print(clash(skill1, skill2, 0).win_rates.overall_rate)
-print("Unique Clashes:", len(clash_dict))
-print("--- %s seconds ---" % (time.time() - start_time))
