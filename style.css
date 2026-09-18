@@ -1,0 +1,22 @@
+.table-display {
+  display: table;
+  width: 100%;
+}
+.cell-display {
+  display: table-cell;
+}
+.div1, .div2, .div3, .div4 {
+  padding: 40px;
+}
+.div1 {
+  background: #ABC;
+}
+.div2 {
+  background: #DEF;
+}
+.div3 {
+  background: #CAD;
+}
+.div4 {
+  background: #FAD;
+}
