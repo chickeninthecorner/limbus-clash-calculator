@@ -15,6 +15,7 @@
 		<p>Red coins are supported. Toggle the type of coin by clicking on it.</p>
 		<p>This app uses <a href="https://pyscript.net/">pyscript</a>. Visit this <a href="">github</a> here.</p>
 		
+		<form>
 		<div class="section-container">
 			<div class="top-skill-container">
 				<h2>Sinner skill</h2>
@@ -26,33 +27,33 @@
 			<div class="input-group">
 				<div class="input-box">
 					<label for="base-power-1">Base Power</label>
-					<input type="number" id="base-power-1" value="5">
+					<input type="number" id="base-power-1" value="5" min="1" required>
 				</div>
 				
 				<div class="operator">+</div>
 
 				<div class="input-box">
 					<label for="coin-power-1">Coin Power</label>
-					<input type="number" id="coin-power-1" value="3">
+					<input type="number" id="coin-power-1" value="3" required>
 				</div>
 
 				<div class="operator">&#215;</div>
 
 				<div class="input-box">
 					<label for="coin-count-1">Coins</label>
-					<input type="number" id="coin-count-1" value="2" min="1" max="50">
+					<input type="number" id="coin-count-1" value="2" min="1" max="50" required>
 				</div>
 
 				<div class="equation_text">with</div>
 
 				<div class="input-box">
 					<label for="sanity-1">Sanity</label>
-					<input type="number" id="sanity-1" value="0" min="-45" max="45">
+					<input type="number" id="sanity-1" value="0" min="-50" max="50" required>
 				</div>
 
 				<div class="input-box">
 					<label for="paralysis-1">Paralysis</label>
-					<input type="number" id="paralysis-1" value="0" min="0">
+					<input type="number" id="paralysis-1" value="0" min="0" required>
 				</div>
 			</div>
 		</div>
@@ -68,33 +69,33 @@
 			<div class="input-group">
 				<div class="input-box">
 					<label for="base-power-2">Base Power</label>
-					<input type="number" id="base-power-2" value="5">
+					<input type="number" id="base-power-2" value="5" min="1" required>
 				</div>
 				
 				<div class="operator">+</div>
 				
 				<div class="input-box">
 					<label for="coin-power-2">Coin Power</label>
-					<input type="number" id="coin-power-2" value="3">
+					<input type="number" id="coin-power-2" value="3" required>
 				</div>
 				
 				<div class="operator">&#215;</div>
 				
 				<div class="input-box">
 					<label for="coin-count-2">Coins</label>
-					<input type="number" id="coin-count-2" value="2" min="1" max="50">
+					<input type="number" id="coin-count-2" value="2" min="1" max="50" required>
 				</div>
 
 				<div class="equation_text">with</div>
 				
 				<div class="input-box">
 					<label for="sanity-2">Sanity</label>
-					<input type="number" id="sanity-2" value="0" min="-45" max="45">
+					<input type="number" id="sanity-2" value="0" min="-50" max="50" required>
 				</div>
 
 				<div class="input-box">
 					<label for="paralysis-2">Paralysis</label>
-					<input type="number" id="paralysis-2" value="0" min="0">
+					<input type="number" id="paralysis-2" value="0" min="0" required>
 				</div>
 			</div>
 		</div>
@@ -131,6 +132,8 @@
 		</div>
 
 		<button id="clash">Clash!</button>
+
+		</form>
 
 		<py-config>
 			[files]

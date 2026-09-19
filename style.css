@@ -5,7 +5,7 @@ body {
 	padding-bottom: 0.25rem; }
 
 .section-container {
-	border: 0.03rem solid gray;
+	border: 0.01rem solid gray;
 	border-radius: 0.5rem;
 	background-color: white;
 	padding: 1.25rem;
@@ -81,7 +81,7 @@ body {
 	background-color: white;
 	padding: 1.25rem;
 	margin-bottom: 0.5rem;
-	width: 30%;
+	width: 29%;
 	height: 13rem;
 	overflow: auto;
 }
@@ -108,7 +108,7 @@ body {
 
 button {
 	display: block;
-	margin: 0.5rem auto;
+	margin: 0.4rem auto;
 	padding: 0.75rem 10rem;
 	font-size: 1.2rem;
 	background-color: #555;
@@ -130,7 +130,7 @@ h2 {
 	margin-top: 0rem;
 }
 
-.result-line {
+.result-container p {
 	margin-bottom: 0.5rem;
 	margin-top: 0.5rem;
 }
