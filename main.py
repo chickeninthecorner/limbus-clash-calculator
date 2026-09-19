@@ -1,5 +1,3 @@
-import copy
-
 factorial_dict = {}
 
 
@@ -32,7 +30,8 @@ class Skill:
 	):
 		self._base_power = base_power
 		self._coins = coins
-		self._coin_count = len(coins)
+		self._intact_coin_count = coins.count('N') + coins.count('R')
+		self._all_coin_count = self._intact_coin_count + coins.count('C')
 		self._coin_power = coin_power
 		self._sanity = sanity
 		self._paralysis = paralysis
@@ -46,8 +45,12 @@ class Skill:
 		return self._coins
 	
 	@property
-	def coin_count(self):
-		return self._coin_count
+	def intact_coin_count(self):
+		return self._intact_coin_count
+
+	@property
+	def all_coin_count(self):
+		return self._all_coin_count
 
 	@property
 	def coin_power(self):
@@ -100,7 +103,7 @@ class Skill:
 			effective_rolling_coins,
 			self.coin_power,
 			self.sanity,
-			min(self.paralysis, self.coin_count),
+			min(self.paralysis, self.all_coin_count),
 		)
 
 	@property
@@ -108,7 +111,7 @@ class Skill:
 		coins_after_losing = list(self.coins)
 
 		broken = False
-		for i in range(self.coin_count - 1, 0, -1):
+		for i in range(self.all_coin_count - 1, 0, -1):
 			if coins_after_losing[i] == 'N':
 				coins_after_losing.pop(i)
 				broken = True
@@ -127,7 +130,7 @@ class Skill:
 					coins_after_losing,
 					self.coin_power,
 					self.sanity,
-					max(self.paralysis - self.coin_count, 0))
+					max(self.paralysis - self.all_coin_count, 0))
 
 	@property
 	def next_skill(self):
@@ -135,7 +138,7 @@ class Skill:
 					self.coins,
 					self.coin_power,
 					self.sanity,
-					max(self.paralysis - self.coin_count, 0))
+					max(self.paralysis - self.all_coin_count, 0))
 
 	def __str__(self):
 		coins_str = ""
@@ -292,15 +295,14 @@ def get_power_probabilities(skill):
 
 	result = {}
 
-	for head_count in range(0, skill.coin_count + 1):
-		tail_count = skill.coin_count - head_count
+	for head_count in range(0, skill.all_coin_count + 1):
+		tail_count = skill.all_coin_count - head_count
 
 		power = skill.base_power + skill.coin_power * head_count
-		power = max(power, 0)
 		probability = (
 			heads_probability**head_count
 			* tails_probability**tail_count
-			* combination(skill.coin_count, head_count)
+			* combination(skill.all_coin_count, head_count)
 		)
 		if power not in result:
 			result[power] = 0.0
@@ -310,6 +312,13 @@ def get_power_probabilities(skill):
 	power_probabilities_dict[skill.effective_rolling_id] = result
 	return result
 
+def convert_negative_to_zero(power_probabilities):
+	for key, value in power_probabilities.items():
+		if key < 0:
+			if 0 in power_probabilities:
+				power_probabilities[0] += value
+			else:
+				power_probabilities[0] = value
 
 outcome_probabilities_dict = {}
 
@@ -321,6 +330,9 @@ def get_parry_outcome_probabilities(skill1, skill2):
 
 	power_probabilities1 = get_power_probabilities(skill1)
 	power_probabilities2 = get_power_probabilities(skill2)
+
+	convert_negative_to_zero(power_probabilities1)
+	convert_negative_to_zero(power_probabilities2)
 
 	result = {"win": 0.0, "tie": 0.0, "lose": 0.0}
 	for power1 in power_probabilities1:
@@ -348,10 +360,10 @@ def clash(skill1, skill2, parry):
 	if dynamic_key in clash_dict:
 		return clash_dict[dynamic_key]
 
-	if skill2.coin_count == 0:
-		return ClashRatesTrio(win_rates=ClashRates({skill1.coin_count: 1.0}))
-	elif skill1.coin_count == 0:
-		return ClashRatesTrio(lose_rates=ClashRates({skill2.coin_count: 1.0}))
+	if skill2.all_coin_count == 0:
+		return ClashRatesTrio(win_rates=ClashRates({skill1.intact_coin_count: 1.0}))
+	elif skill1.all_coin_count == 0:
+		return ClashRatesTrio(lose_rates=ClashRates({skill2.intact_coin_count: 1.0}))
 	elif parry == 99:
 		return ClashRatesTrio(tie_rates=ClashRates({"overall": 1.0}))
 
