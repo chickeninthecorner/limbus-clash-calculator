@@ -10,16 +10,16 @@
 </head>
 <html>
 	<body>
-		<h1>Limbus Clash Calculator</h1>
-		<p>Welcome to this skill Calculator! Simply key in the relevant information and click clash.</p>
-		<p>Some elements and functions may take some time to load.</p>
-		<p>Red coins are supported. Toggle the type of coin by clicking on it. (WIP)</p>
+		<h1>Ven's Limbus Clash Calculator</h1>
+		<p>Welcome to this clash calculator! Simply scroll down and key in the relevant information and click clash.</p>
+		<p>Red coins are supported. Toggle the type of coin by clicking on it.</p>
+		<p>This app uses <a href="https://pyscript.net/">pyscript</a>. Visit this <a href="">github</a> here.</p>
 		
-		<div class="skill_container">
+		<div class="section-container">
 			<div class="top-skill-container">
 				<h2>Sinner skill</h2>
 				<div class="circle-container" id="circle-container-1">
-					<img src="normal_coin.webp" class="coin yellow">
+					<img src="normal_coin.webp" class="coin normal">
 				</div>
 			</div>
 
@@ -57,11 +57,11 @@
 			</div>
 		</div>
 
-		<div class="skill_container">
+		<div class="section-container">
 			<div class="top-skill-container">
 				<h2>Enemy skill</h2>
 				<div class="circle-container" id="circle-container-2">
-					<img src="normal_coin.webp" class="coin yellow">
+					<img src="normal_coin.webp" class="coin normal">
 				</div>
 			</div>
 
@@ -99,23 +99,44 @@
 			</div>
 		</div>
 
+		<div class="all-result-container">
+			<div class="result-container">
+				<div class="top-skill-container">
+					<h2>Win Rate:</h2>
+					<h2 id="win-rate">-<h2>
+				</div>
+				<div id="win-line-container">
+				
+				</div>
+			</div>
+			
+			<div class="result-container">
+				<div class="top-skill-container">
+					<h2>Tie Rate:</h2>
+					<h2 id="tie-rate">-<h2>
+				</div>
+				<p>A tie is triggered if a clash has no winner after 99 parries.</p>
+				<p>The final power of a skill will always be at least zero.</p>
+			</div>
+			
+			<div class="result-container">
+				<div class="top-skill-container">
+					<h2>Lose Rate:</h2>
+					<h2 id="lose-rate">-<h2>
+				</div>
+				<div id="lose-line-container">
+				
+				</div>
+			</div>
+		</div>
+
 		<button id="clash">Clash!</button>
 
-		<div class="result_container">
-			<h2>Results</h2>
-			
-			<h3>Win Rate: <span id="overall-win-rate"></span></h3>
+		<py-config>
+			[files]
+			"main.py" = "./main.py"
+		</py-config>
 
-			<h3>Tie Rate: <span id="overall-tie-rate"></span></h3>
-
-			<h3>Lose Rate: <span id="overall-lose-rate"></span></h3>
-			
-			<py-config>
-				[files]
-				"main.py" = "./main.py"
-			</py-config>
-
-			<script type="py" src="./web.py"></script>
-		</div>
+		<script type="py" src="./web.py"></script>
 	</body>
 </html>

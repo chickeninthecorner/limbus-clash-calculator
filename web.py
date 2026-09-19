@@ -1,8 +1,9 @@
 from pyscript import when, document
 from main import clash, Skill
 
+
 @when("click", "#clash")
-def update_all(event=None):
+def calculate_clash(event=None):
 	base_power_1 = int(document.querySelector("#base-power-1").value)
 	coin_power_1 = int(document.querySelector("#coin-power-1").value)
 	sanity_1 = int(document.querySelector("#sanity-1").value)
@@ -14,7 +15,7 @@ def update_all(event=None):
 	contained_coins = container.querySelectorAll(".coin")
 
 	for coin in contained_coins:
-		if coin.classList.contains("yellow"):
+		if coin.classList.contains("normal"):
 			coins_1.append('N')
 		elif coin.classList.contains("red"):
 			coins_1.append('R')
@@ -30,7 +31,7 @@ def update_all(event=None):
 	contained_coins = container.querySelectorAll(".coin")
 
 	for coin in contained_coins:
-		if coin.classList.contains("yellow"):
+		if coin.classList.contains("normal"):
 			coins_2.append('N')
 		elif coin.classList.contains("red"):
 			coins_2.append('R')
@@ -41,12 +42,32 @@ def update_all(event=None):
 	try:
 		result = clash(skill1, skill2, 0)
 		
-		document.querySelector("#overall-win-rate").innerHTML = f"{result.win_rates.overall_rate * 100:.2f}%"
-		document.querySelector("#overall-tie-rate").innerHTML = f"{result.tie_rates.overall_rate * 100:.2f}%"
-		document.querySelector("#overall-lose-rate").innerHTML = f"{result.lose_rates.overall_rate * 100:.2f}%"
+		document.querySelector("#win-rate").innerHTML = f"{result.win_rates.overall_rate * 100:.2f}%"
+		document.querySelector("#tie-rate").innerHTML = f"{result.tie_rates.overall_rate * 100:.2f}%"
+		document.querySelector("#lose-rate").innerHTML = f"{result.lose_rates.overall_rate * 100:.2f}%"
+
+		container = document.querySelector("#win-line-container")
+		container.innerHTML = ""
+
+		print(result.win_rates.rates.items())
+		for key, value in result.win_rates.rates.items():
+			new_line = document.createElement("p")
+			new_line.className = "result-line"
+			new_line.innerHTML = f"{key} coins left: {value * 100:.2f}%"
+			container.appendChild(new_line)
+
+		document.querySelector("button").disabled = True
+		document.querySelector(".all-result-container").style.opacity = 1
 
 	except Exception as e:
 		print(e)
+
+@when("click", ".circle-container")
+@when("input", "input")
+def undisable_button(event=None):
+	document.querySelector("button").disabled = False
+	document.querySelector(".all-result-container").style.opacity = 0.5
+
 
 @when("input", "#coin-count-1")
 @when("input", "#coin-count-2")
@@ -66,7 +87,7 @@ def update_coins(event=None, id=None):
 		for _ in range(coins_to_add):
 			new_coin = document.createElement("img")
 			new_coin.src = "normal_coin.webp"
-			new_coin.className = "coin yellow"
+			new_coin.className = "coin normal"
 			container.appendChild(new_coin)
 
 	elif coin_count_input < current_count:
@@ -79,12 +100,13 @@ def toggle_circle_color(event):
 	clicked_element = event.target
 	
 	if clicked_element.classList.contains("coin"):
-		if clicked_element.classList.contains("yellow"):
+		if clicked_element.classList.contains("normal"):
 			clicked_element.src = "unbreakable_coin.webp"
 			clicked_element.className = "coin red"
 		else:
 			clicked_element.src = "normal_coin.webp"
-			clicked_element.className = "coin yellow"
+			clicked_element.className = "coin normal"
 
 update_coins(id="coin-count-1")
 update_coins(id="coin-count-2")
+calculate_clash()
