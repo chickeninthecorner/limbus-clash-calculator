@@ -1,4 +1,4 @@
-from pyscript import when, document
+from pyscript import when, document, display
 from main import clash, Skill
 
 @when("click", "#clash")
@@ -21,12 +21,15 @@ def update_all():
 	try:
 		result = clash(skill1, skill2, 0)
 		
-		output_html = f"Skill 1: {base_power_1}+{coin_power_1}x{coin_count_1}\
-			<br>Skill 2: {base_power_2}+{coin_power_2}x{coin_count_2}\
-			<br>\
-			<br>Win rate: {round(result.win_rates.overall_rate * 100, 3)}%\
-			<br>Lose rate: {round(result.lose_rates.overall_rate * 100, 3)}%"
-		
-		document.querySelector("#display").innerHTML = output_html
-	except:
-		pass
+		document.querySelector("#overall-win-rate").innerHTML = f"{result.win_rates.overall_rate * 100:.2f}%"
+		document.querySelector("#overall-tie-rate").innerHTML = f"{result.tie_rates.overall_rate * 100:.2f}%"
+		document.querySelector("#overall-lose-rate").innerHTML = f"{result.lose_rates.overall_rate * 100:.2f}%"
+
+	except Exception as e:
+		print(e)
+# fig, (ax1, ax2) = plt.subplots(2, sharex=True)
+# ax1.bar([1, 2, 3], [0.5, 0.4, 0.1])
+# ax1.set_xticks([1, 2, 3])
+# ax2.bar([1, 2, 3, 4], [0.5, 0.4, 0.1, 0])
+# ax2.set_xticks([1, 2, 3])
+# plt.show()

@@ -5,42 +5,43 @@
     
 		<link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
 		<script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+		<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 		<style>
 			body { font-family: Arial, sans-serif; padding: 60px; padding-top: 15px; }
 
 			.skill_container {
-				border: 1px solid gray;
-				border-radius: 8px;
+				border: 0.06rem solid gray;
+				border-radius: 0.5rem;
 				background-color: white;
-				padding: 20px;
-				margin-bottom: 20px;
-				box-shadow: 0 30px 40px rgba(0,0,0,.1);
+				padding: 1.25rem;
+				margin-bottom: 1.25rem;
+				box-shadow: 0 1.88rem 2.5rem rgba(0,0,0,.1);
+			}
+
+			.result_container {
+				border: 0.06rem solid gray;
+				border-radius: 0.5rem;
+				background-color: white;
+				padding: 1.25rem;
+				margin-bottom: 1.25rem;
+				box-shadow: 0 1.88rem 2.5rem rgba(0,0,0,.1);
 			}
 
 			.top-skill-container {
 				display: flex; 
 				align-items: center; 
-				gap: 20px; 
-				padding-bottom: 10px;
+				gap: 1.25rem; 
+				padding-bottom: 0.63rem;
 			}
 
 			.input-group {
 				display: flex; 
 				align-items: flex-end; 
-				gap: 15px; 
-				font-size: 24px; 
+				gap: 0.94rem; 
+				font-size: 1.5rem; 
 				font-weight: bold;
 				flex-shrink: 0; /* Prevents the boxes from shrinking */
-				padding-bottom: 10px;
-			}
-
-			.input-group-bottom {
-				display: flex; 
-				align-items: flex-end; 
-				gap: 45px; 
-				font-size: 24px; 
-				font-weight: bold;
-				flex-shrink: 0; /* Prevents the boxes from shrinking */
+				padding-bottom: 0.63rem;
 			}
 			
 			.input-box {
@@ -57,39 +58,58 @@
 			}
 			
 			.input-box input {
-				width: 70px; 
-				padding: 8px; 
-				font-size: 20px; 
+				width: 4.38rem; 
+				padding: 0.5rem; 
+				font-size: 1.25rem; 
 				text-align: center;
-				border: 2px solid #ccc;
-				border-radius: 5px;
+				border: 0.13rem solid #ccc;
+				border-radius: 0.31rem;
 			}
 
 			.operator {
-				padding-bottom: 5px;
+				padding-bottom: 0.31rem;
 				color: #555;
 			}
 
 			.equation_text {
-				padding-bottom: 5px;
+				padding-bottom: 0.31rem;
 				font-weight: normal;
 				color: lightgrey;
 			}
 
-			.submit_box {
-				padding: 10px;
-			}
-
 			.circle-container {
 				display: flex; 
-				gap: 15px;
+				gap: 0.94rem;
 				flex-wrap: wrap;
 				flex-grow: 1;
 			}
 
 			.coin {
-				height: 60px;
-				width: 60px;
+				height: 3.75rem;
+				width: 3.75rem;
+			}
+
+			button {
+				display: block;
+				margin: 2rem auto;
+				padding: 0.75rem 10rem;
+				font-size: 1.2rem;
+				background-color: #555;
+				color: white;
+				border: none;
+				border-radius: 0.5rem;
+				cursor: pointer;
+				font-family: sans-serif;
+				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+			}
+
+			#graphs {
+				display: flex;
+				width: 100%;
+			}
+
+			h2 {
+				flex-shrink: 0;
 			}
 		</style>
 </head>
@@ -98,7 +118,7 @@
 		<h1>Limbus Clash Calculator</h1>
 		<p>Welcome to this skill Calculator! Simply key in the relevant information and press clash.</p>
 		<p>Red coins are supported. Toggle the type of coin by clicking on it. (WIP)</p>
-
+		
 		<div class="skill_container">
 			<div class="top-skill-container">
 				<h2>Sinner skill</h2>
@@ -138,10 +158,6 @@
 					<label for="paralysis-1">Paralysis</label>
 					<input type="number" id="paralysis-1" value="0" min="0">
 				</div>
-			</div>
-
-			<div class="input-group-bottom">
-				
 			</div>
 		</div>
 
@@ -187,12 +203,25 @@
 			</div>
 		</div>
 
-		<div class="submit_box">
-			<button id="clash">Clash!</button>
-		</div>
+		<button id="clash">Clash!</button>
 
-		<p id="display">...</p>
-		
-		<script type="py" src="./web.py" config="./pyscript.toml"></script>
+		<div class="result_container">
+			<h2>Results</h2>
+			
+			<h3>Win Rate: <span id="overall-win-rate"></span></h3>
+
+			<h3>Tie Rate: <span id="overall-tie-rate"></span></h3>
+
+			<h3>Lose Rate: <span id="overall-lose-rate"></span></h3>
+			
+			<py-config>
+				packages = ["plotly", "numpy", "pandas"]
+
+				[files]
+				"main.py" = "./main.py"
+			</py-config>
+
+			<script type="py" src="./web.py"></script>
+		</div>
 	</body>
 </html>
