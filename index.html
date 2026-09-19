@@ -6,124 +6,20 @@
 		<link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
 		<script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 		<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-		<style>
-			body { font-family: Arial, sans-serif; padding: 60px; padding-top: 15px; }
-
-			.skill_container {
-				border: 0.06rem solid gray;
-				border-radius: 0.5rem;
-				background-color: white;
-				padding: 1.25rem;
-				margin-bottom: 1.25rem;
-				box-shadow: 0 1.88rem 2.5rem rgba(0,0,0,.1);
-			}
-
-			.result_container {
-				border: 0.06rem solid gray;
-				border-radius: 0.5rem;
-				background-color: white;
-				padding: 1.25rem;
-				margin-bottom: 1.25rem;
-				box-shadow: 0 1.88rem 2.5rem rgba(0,0,0,.1);
-			}
-
-			.top-skill-container {
-				display: flex; 
-				align-items: center; 
-				gap: 1.25rem; 
-				padding-bottom: 0.63rem;
-			}
-
-			.input-group {
-				display: flex; 
-				align-items: flex-end; 
-				gap: 0.94rem; 
-				font-size: 1.5rem; 
-				font-weight: bold;
-				flex-shrink: 0; /* Prevents the boxes from shrinking */
-				padding-bottom: 0.63rem;
-			}
-			
-			.input-box {
-				display: flex; 
-				flex-direction: column; 
-				align-items: center; 
-			}
-			
-			.input-box label {
-				font-size: 14px; 
-				margin-bottom: 5px; 
-				color: #555; 
-				font-weight: normal;
-			}
-			
-			.input-box input {
-				width: 4.38rem; 
-				padding: 0.5rem; 
-				font-size: 1.25rem; 
-				text-align: center;
-				border: 0.13rem solid #ccc;
-				border-radius: 0.31rem;
-			}
-
-			.operator {
-				padding-bottom: 0.31rem;
-				color: #555;
-			}
-
-			.equation_text {
-				padding-bottom: 0.31rem;
-				font-weight: normal;
-				color: lightgrey;
-			}
-
-			.circle-container {
-				display: flex; 
-				gap: 0.94rem;
-				flex-wrap: wrap;
-				flex-grow: 1;
-			}
-
-			.coin {
-				height: 3.75rem;
-				width: 3.75rem;
-			}
-
-			button {
-				display: block;
-				margin: 2rem auto;
-				padding: 0.75rem 10rem;
-				font-size: 1.2rem;
-				background-color: #555;
-				color: white;
-				border: none;
-				border-radius: 0.5rem;
-				cursor: pointer;
-				font-family: sans-serif;
-				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-			}
-
-			#graphs {
-				display: flex;
-				width: 100%;
-			}
-
-			h2 {
-				flex-shrink: 0;
-			}
-		</style>
+		<link rel="stylesheet" href="style.css">
 </head>
 <html>
 	<body>
 		<h1>Limbus Clash Calculator</h1>
-		<p>Welcome to this skill Calculator! Simply key in the relevant information and press clash.</p>
+		<p>Welcome to this skill Calculator! Simply key in the relevant information and click clash.</p>
+		<p>Some elements and functions may take some time to load.</p>
 		<p>Red coins are supported. Toggle the type of coin by clicking on it. (WIP)</p>
 		
 		<div class="skill_container">
 			<div class="top-skill-container">
 				<h2>Sinner skill</h2>
 				<div class="circle-container" id="circle-container-1">
-					<img src="normal_coin.webp" class="coin">
+					<img src="normal_coin.webp" class="coin yellow">
 				</div>
 			</div>
 
@@ -144,7 +40,7 @@
 
 				<div class="input-box">
 					<label for="coin-count-1">Coins</label>
-					<input type="number" id="coin-count-1" value="2" min="1" max="20">
+					<input type="number" id="coin-count-1" value="2" min="1" max="50">
 				</div>
 
 				<div class="equation_text">with</div>
@@ -165,7 +61,7 @@
 			<div class="top-skill-container">
 				<h2>Enemy skill</h2>
 				<div class="circle-container" id="circle-container-2">
-					<img src="normal_coin.webp" class="coin">
+					<img src="normal_coin.webp" class="coin yellow">
 				</div>
 			</div>
 
@@ -186,7 +82,7 @@
 				
 				<div class="input-box">
 					<label for="coin-count-2">Coins</label>
-					<input type="number" id="coin-count-2" value="2" min="1" max="20">
+					<input type="number" id="coin-count-2" value="2" min="1" max="50">
 				</div>
 
 				<div class="equation_text">with</div>
@@ -215,8 +111,6 @@
 			<h3>Lose Rate: <span id="overall-lose-rate"></span></h3>
 			
 			<py-config>
-				packages = ["plotly", "numpy", "pandas"]
-
 				[files]
 				"main.py" = "./main.py"
 			</py-config>
