@@ -6,7 +6,23 @@
 		<link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
 		<script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 		<style>
-			body { font-family: Arial, sans-serif; padding: 40px; }
+			body { font-family: Arial, sans-serif; padding: 60px; padding-top: 15px; }
+
+			.skill_container {
+				border: 1px solid gray;
+				border-radius: 8px;
+				background-color: white;
+				padding: 20px;
+				margin-bottom: 20px;
+				box-shadow: 0 30px 40px rgba(0,0,0,.1);
+			}
+
+			.top-skill-container {
+				display: flex; 
+				align-items: center; 
+				gap: 20px; 
+				padding-bottom: 10px;
+			}
 
 			.input-group {
 				display: flex; 
@@ -15,7 +31,7 @@
 				font-size: 24px; 
 				font-weight: bold;
 				flex-shrink: 0; /* Prevents the boxes from shrinking */
-				padding: 10px;
+				padding-bottom: 10px;
 			}
 
 			.input-group-bottom {
@@ -25,7 +41,6 @@
 				font-size: 24px; 
 				font-weight: bold;
 				flex-shrink: 0; /* Prevents the boxes from shrinking */
-				padding: 10px;
 			}
 			
 			.input-box {
@@ -52,86 +67,126 @@
 
 			.operator {
 				padding-bottom: 5px;
+				color: #555;
+			}
+
+			.equation_text {
+				padding-bottom: 5px;
+				font-weight: normal;
+				color: lightgrey;
 			}
 
 			.submit_box {
 				padding: 10px;
+			}
 
+			.circle-container {
+				display: flex; 
+				gap: 15px;
+				flex-wrap: wrap;
+				flex-grow: 1;
+			}
+
+			.coin {
+				height: 60px;
+				width: 60px;
 			}
 		</style>
 </head>
 <html>
 	<body>
-		<h1>Skill 1</h1>
-		<div class="input-group">
-            <div class="input-box">
-                <label for="base-power-1">Base Power</label>
-                <input type="number" id="base-power-1" value="5">
-            </div>
-            
-            <div class="operator">+</div>
+		<h1>Limbus Clash Calculator</h1>
+		<p>Welcome to this skill Calculator! Simply key in the relevant information and press clash.</p>
+		<p>Red coins are supported. Toggle the type of coin by clicking on it. (WIP)</p>
 
-			<div class="input-box">
-                <label for="coin-power-1">Coin Power</label>
-                <input type="number" id="coin-power-1" value="3">
-            </div>
-
-			<div class="operator">&#215;</div>
-
-            <div class="input-box">
-                <label for="coin-count-1">Coins</label>
-                <input type="number" id="coin-count-1" value="2" min="1" max="20">
-            </div>
-
-			
-        </div>
-
-		<div class="input-group-bottom">
-			<div class="input-box">
-				<label for="sanity-1">Sanity</label>
-				<input type="number" id="sanity-1" value="0" min="-45" max="45">
+		<div class="skill_container">
+			<div class="top-skill-container">
+				<h2>Sinner skill</h2>
+				<div class="circle-container" id="circle-container-1">
+					<img src="normal_coin.webp" class="coin">
+				</div>
 			</div>
 
-			<div class="input-box">
-				<label for="paralysis-1">Paralysis</label>
-				<input type="number" id="paralysis-1" value="0" min="0">
+			<div class="input-group">
+				<div class="input-box">
+					<label for="base-power-1">Base Power</label>
+					<input type="number" id="base-power-1" value="5">
+				</div>
+				
+				<div class="operator">+</div>
+
+				<div class="input-box">
+					<label for="coin-power-1">Coin Power</label>
+					<input type="number" id="coin-power-1" value="3">
+				</div>
+
+				<div class="operator">&#215;</div>
+
+				<div class="input-box">
+					<label for="coin-count-1">Coins</label>
+					<input type="number" id="coin-count-1" value="2" min="1" max="20">
+				</div>
+
+				<div class="equation_text">with</div>
+
+				<div class="input-box">
+					<label for="sanity-1">Sanity</label>
+					<input type="number" id="sanity-1" value="0" min="-45" max="45">
+				</div>
+
+				<div class="input-box">
+					<label for="paralysis-1">Paralysis</label>
+					<input type="number" id="paralysis-1" value="0" min="0">
+				</div>
+			</div>
+
+			<div class="input-group-bottom">
+				
+			</div>
+		</div>
+
+		<div class="skill_container">
+			<div class="top-skill-container">
+				<h2>Enemy skill</h2>
+				<div class="circle-container" id="circle-container-2">
+					<img src="normal_coin.webp" class="coin">
+				</div>
+			</div>
+
+			<div class="input-group">
+				<div class="input-box">
+					<label for="base-power-2">Base Power</label>
+					<input type="number" id="base-power-2" value="5">
+				</div>
+				
+				<div class="operator">+</div>
+				
+				<div class="input-box">
+					<label for="coin-power-2">Coin Power</label>
+					<input type="number" id="coin-power-2" value="3">
+				</div>
+				
+				<div class="operator">&#215;</div>
+				
+				<div class="input-box">
+					<label for="coin-count-2">Coins</label>
+					<input type="number" id="coin-count-2" value="2" min="1" max="20">
+				</div>
+
+				<div class="equation_text">with</div>
+				
+				<div class="input-box">
+					<label for="sanity-2">Sanity</label>
+					<input type="number" id="sanity-2" value="0" min="-45" max="45">
+				</div>
+
+				<div class="input-box">
+					<label for="paralysis-2">Paralysis</label>
+					<input type="number" id="paralysis-2" value="0" min="0">
+				</div>
 			</div>
 		</div>
 
-		<h1>Skill 2</h1>
-		<div class="input-group">
-            <div class="input-box">
-                <label for="base-power-2">Base Power</label>
-                <input type="number" id="base-power-2" value="5">
-            </div>
-            
-            <div class="operator">+</div>
-            
-            <div class="input-box">
-                <label for="coin-power-2">Coin Power</label>
-                <input type="number" id="coin-power-2" value="3">
-            </div>
-            
-            <div class="operator">&#215;</div>
-            
-            <div class="input-box">
-                <label for="coin-count-2">Coins</label>
-                <input type="number" id="coin-count-2" value="2" min="1" max="20">
-            </div>
-        </div>
-
-		<div class="input-group-bottom">
-			<div class="input-box">
-				<label for="sanity-2">Sanity</label>
-				<input type="number" id="sanity-2" value="0" min="-45" max="45">
-			</div>
-
-			<div class="input-box">
-				<label for="paralysis-2">Paralysis</label>
-				<input type="number" id="paralysis-2" value="0" min="0">
-			</div>
-		</div>
-		
 		<div class="submit_box">
 			<button id="clash">Clash!</button>
 		</div>
