@@ -200,7 +200,7 @@ class ClashRatesTrio:
 	@property
 	def reversed_rates(self):
 		return ClashRatesTrio(
-			self.lose_r, 
+			self.lose_rates, 
 			self.tie_rates,
 			self.win_rates)
 	
@@ -226,7 +226,7 @@ def get_combined_power_probabilities(
 	key = (frozenset(power_probabilities1.items()), frozenset(power_probabilities2.items()))
 	if key in combined_power_probabilities_dict:
 		return combined_power_probabilities_dict[key]
-	reversed_key = reversed(key)
+	reversed_key = (key[1], key[0])
 	if reversed_key in combined_power_probabilities_dict:
 		return combined_power_probabilities_dict[reversed_key]
 
@@ -361,7 +361,9 @@ def clash(skill1, skill2, parry):
 	dynamic_key = (skill1.dynamic_id, skill2.dynamic_id, parry)
 	if dynamic_key in clash_dict:
 		return clash_dict[dynamic_key]
-	reversed_key = reversed(dynamic_key)
+	reversed_key = (skill2.dynamic_id, skill1.dynamic_id, parry)
+	if reversed_key in clash_dict:
+		return clash_dict[reversed_key].reversed_rates
 
 	if skill2.all_coin_count == 0:
 		return ClashRatesTrio(win_rates=ClashRates({skill1.intact_coin_count: 1.0}))
