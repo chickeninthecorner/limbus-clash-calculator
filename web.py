@@ -58,7 +58,7 @@ def calculate_clash(event=None):
 		container = document.querySelector("#lose-line-container")
 		container.innerHTML = ""
 
-		for key, value in result.lose_rates.rates.items():
+		for key, value in dict(reversed(list(result.lose_rates.rates.items()))).items():
 			new_line = document.createElement("p")
 			new_line.innerHTML = f"{key} intact coins left: {value * 100:.3f}%"
 			container.appendChild(new_line)
