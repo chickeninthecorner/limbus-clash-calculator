@@ -216,46 +216,6 @@ class ClashRatesTrio:
 			self.tie_rates * other.tie_rates,
 			self.lose_rates * other.lose_rates)
 
-reduced_rolling_components_dict = {}
-
-def get_reduced_rolling_components(skill):
-	if skill.effective_rolling_id in reduced_rolling_components_dict:
-		return reduced_rolling_components_dict[skill.effective_rolling_id]
-	
-	paralysis = skill.paralysis
-	last_effective_coin_power = None
-
-	result = []
-	if skill.base_power != 0:
-		result.append(Skill(skill.base_power, ('N',), 0))
-	consecutive_coins = 0
-
-	for coin in skill.coins:
-		if paralysis > 0:
-			effective_coin_power = 0
-		elif coin == 'C':
-			effective_coin_power = skill.coin_power // abs(skill.coin_power)
-		else:
-			effective_coin_power = skill.coin_power
-
-		if last_effective_coin_power is None:
-			last_effective_coin_power = effective_coin_power
-			consecutive_coins = 1
-		elif last_effective_coin_power == effective_coin_power and consecutive_coins < 10:
-			consecutive_coins += 1
-		else:
-			result.append(Skill(0, ('N',) * consecutive_coins, last_effective_coin_power, skill.sanity))
-
-			consecutive_coins = 1
-			last_effective_coin_power = effective_coin_power
-
-		paralysis = max(paralysis - 1, 0)
-
-	result.append(Skill(0, ('N',) * consecutive_coins, last_effective_coin_power, skill.sanity))
-	reduced_rolling_components_dict[skill.effective_rolling_id] = result
-
-	return result
-
 
 combined_power_probabilities_dict = {}
 
@@ -287,6 +247,39 @@ def get_combined_power_probabilities(
 	return result
 
 
+def sum_reduced_rolling_components(skill):
+	paralysis = skill.paralysis
+	last_effective_coin_power = None
+
+	result = get_power_probabilities(Skill(skill.base_power, ('N',), 0))
+	consecutive_coins = 0
+
+	for coin in skill.coins:
+		if paralysis > 0:
+			effective_coin_power = 0
+		elif coin == 'C':
+			effective_coin_power = skill.coin_power // abs(skill.coin_power)
+		else:
+			effective_coin_power = skill.coin_power
+
+		if last_effective_coin_power is None:
+			last_effective_coin_power = effective_coin_power
+			consecutive_coins = 1
+		elif last_effective_coin_power == effective_coin_power:
+			consecutive_coins += 1
+		else:
+			result = get_combined_power_probabilities(result, get_power_probabilities(Skill(0, ('N',) * consecutive_coins, last_effective_coin_power, skill.sanity)))
+
+			consecutive_coins = 1
+			last_effective_coin_power = effective_coin_power
+
+		paralysis = max(paralysis - 1, 0)
+
+	result = get_combined_power_probabilities(result, get_power_probabilities(Skill(0, ('N',) * consecutive_coins, last_effective_coin_power, skill.sanity)))
+
+	return result
+
+
 power_probabilities_dict = {}
 
 
@@ -294,17 +287,10 @@ def get_power_probabilities(skill):
 	if skill.effective_rolling_id in power_probabilities_dict:
 		return power_probabilities_dict[skill.effective_rolling_id]
 	elif skill.reducible:
-		divided_skills = get_reduced_rolling_components(skill)
-		
-		power_probabilities = []
-		for skill in divided_skills:
-			power_probabilities.append(get_power_probabilities(skill))
+		result = sum_reduced_rolling_components(skill)
 
-		combined_power_probabilities = power_probabilities[0]
-		for i in range(1, len(power_probabilities)):
-			combined_power_probabilities = get_combined_power_probabilities(combined_power_probabilities, power_probabilities[i])
-
-		return combined_power_probabilities
+		power_probabilities_dict[skill.effective_rolling_id] = result
+		return result
 
 	heads_probability = skill.sanity / 100 + 0.5
 	tails_probability = 1 - heads_probability
