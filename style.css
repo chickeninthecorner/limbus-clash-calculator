@@ -82,8 +82,11 @@ body {
 	padding: 1.25rem;
 	margin-bottom: 0.5rem;
 	width: 29%;
-	height: 13rem;
+}
+
+.result-line-container {
 	overflow: auto;
+	height: 10rem;
 }
 
 #win-rate {
