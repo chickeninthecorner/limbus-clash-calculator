@@ -380,9 +380,3 @@ def clash(skill1, skill2, parry):
 
 	clash_dict[dynamic_key] = result
 	return result
-
-import time
-start_time = time.time()
-skill = Skill(10, ('N',) * 30, 1)
-clash(skill, skill, 0)
-print("--- %s seconds ---" % (time.time() - start_time))
