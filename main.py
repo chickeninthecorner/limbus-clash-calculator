@@ -1,27 +1,11 @@
-factorial_dict = {}
-
-
-def factorial(x):
-	if x in factorial_dict:
-		return factorial_dict[x]
-	if x == 0 or x == 1:
-		return 1
-	else:
-		result = x * factorial(x - 1)
-		factorial_dict[x] = result
-		return result
-
+import math
+from functools import lru_cache
 
 combination_dict = {}
 
-
+@lru_cache(maxsize=None)
 def combination(n, r):
-	if (n, r) in combination_dict:
-		return combination_dict[(n, r)]
-	else:
-		ans = factorial(n) / factorial(n - r) / factorial(r)
-		combination_dict[(n, r)] = ans
-		return ans
+		return math.comb(n, r)
 
 
 class Skill:
@@ -160,9 +144,8 @@ class ClashRates:
 		return sum(self.rates.values())
 		
 	def __add__(self, other):
-		result = {}
-		for key, value in self.rates.items():
-			result[key] = value
+		result = {key: value for key, value in self.rates.items()}
+
 		for key, value in other.rates.items():
 			if key not in result:
 				result[key] = value
@@ -172,11 +155,7 @@ class ClashRates:
 		return ClashRates(result)
 
 	def __mul__(self, other):
-		result = {}
-		for key, value in self.rates.items():
-			result[key] = value * other
-		
-		return ClashRates(result)
+		return ClashRates({key: value * other for key, value in self.rates.items()})
 		
 
 class ClashRatesTrio:
@@ -234,7 +213,7 @@ def get_combined_power_probabilities(
 
 	for power1 in power_probabilities1:
 		for power2 in power_probabilities2:
-			combined_power = power1 + power2
+			combined_power = max(power1 + power2, 0)
 			combined_probability = (
 				power_probabilities1[power1] * power_probabilities2[power2]
 			)
@@ -314,13 +293,6 @@ def get_power_probabilities(skill):
 	power_probabilities_dict[skill.effective_rolling_id] = result
 	return result
 
-def convert_negative_to_zero(power_probabilities):
-	for key, value in power_probabilities.items():
-		if key < 0:
-			if 0 in power_probabilities:
-				power_probabilities[0] += value
-			else:
-				power_probabilities[0] = value
 
 outcome_probabilities_dict = {}
 
@@ -329,12 +301,13 @@ def get_parry_outcome_probabilities(skill1, skill2):
 	effective_dynamic_key = (skill1.effective_rolling_id, skill2.effective_rolling_id)
 	if effective_dynamic_key in outcome_probabilities_dict:
 		return outcome_probabilities_dict[effective_dynamic_key]
+	reversed_key = (skill2.effective_rolling_id, skill1.effective_rolling_id)
+	if reversed_key in outcome_probabilities_dict:
+		cached = outcome_probabilities_dict[reversed_key]
+		return {"win": cached["lose"], "tie": cached["tie"], "lose": cached["win"]}
 
 	power_probabilities1 = get_power_probabilities(skill1)
 	power_probabilities2 = get_power_probabilities(skill2)
-
-	convert_negative_to_zero(power_probabilities1)
-	convert_negative_to_zero(power_probabilities2)
 
 	result = {"win": 0.0, "tie": 0.0, "lose": 0.0}
 	for power1 in power_probabilities1:
