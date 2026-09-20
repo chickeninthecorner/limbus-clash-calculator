@@ -196,6 +196,13 @@ class ClashRatesTrio:
 	@property
 	def lose_rates(self):
 		return self._lose_rates
+
+	@property
+	def reversed_rates(self):
+		return ClashRatesTrio(
+			self.lose_r, 
+			self.tie_rates,
+			self.win_rates)
 	
 	def __add__(self, other):
 		return ClashRates(
@@ -209,13 +216,18 @@ class ClashRatesTrio:
 			self.tie_rates * other.tie_rates,
 			self.lose_rates * other.lose_rates)
 
+reduced_rolling_components_dict = {}
 
 def get_reduced_rolling_components(skill):
+	if skill.effective_rolling_id in reduced_rolling_components_dict:
+		return reduced_rolling_components_dict[skill.effective_rolling_id]
+	
 	paralysis = skill.paralysis
 	last_effective_coin_power = None
 
 	result = []
-	result.append(Skill(skill.base_power, ('N',), 0))
+	if skill.base_power != 0:
+		result.append(Skill(skill.base_power, ('N',), 0))
 	consecutive_coins = 0
 
 	for coin in skill.coins:
@@ -229,7 +241,7 @@ def get_reduced_rolling_components(skill):
 		if last_effective_coin_power is None:
 			last_effective_coin_power = effective_coin_power
 			consecutive_coins = 1
-		elif last_effective_coin_power == effective_coin_power:
+		elif last_effective_coin_power == effective_coin_power and consecutive_coins < 10:
 			consecutive_coins += 1
 		else:
 			result.append(Skill(0, ('N',) * consecutive_coins, last_effective_coin_power, skill.sanity))
@@ -240,6 +252,7 @@ def get_reduced_rolling_components(skill):
 		paralysis = max(paralysis - 1, 0)
 
 	result.append(Skill(0, ('N',) * consecutive_coins, last_effective_coin_power, skill.sanity))
+	reduced_rolling_components_dict[skill.effective_rolling_id] = result
 
 	return result
 
@@ -253,6 +266,9 @@ def get_combined_power_probabilities(
 	key = (frozenset(power_probabilities1.items()), frozenset(power_probabilities2.items()))
 	if key in combined_power_probabilities_dict:
 		return combined_power_probabilities_dict[key]
+	reversed_key = reversed(key)
+	if reversed_key in combined_power_probabilities_dict:
+		return combined_power_probabilities_dict[reversed_key]
 
 	result = {}
 
@@ -359,6 +375,7 @@ def clash(skill1, skill2, parry):
 	dynamic_key = (skill1.dynamic_id, skill2.dynamic_id, parry)
 	if dynamic_key in clash_dict:
 		return clash_dict[dynamic_key]
+	reversed_key = reversed(dynamic_key)
 
 	if skill2.all_coin_count == 0:
 		return ClashRatesTrio(win_rates=ClashRates({skill1.intact_coin_count: 1.0}))
@@ -402,3 +419,9 @@ def clash(skill1, skill2, parry):
 
 	clash_dict[dynamic_key] = result
 	return result
+
+import time
+start_time = time.time()
+skill = Skill(10, ('N',) * 30, 1)
+clash(skill, skill, 0)
+print("--- %s seconds ---" % (time.time() - start_time))
