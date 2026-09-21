@@ -1,12 +1,9 @@
 import math
 from functools import lru_cache
 
-combination_dict = {}
-
 @lru_cache(maxsize=None)
 def combination(n, r):
-		return math.comb(n, r)
-
+	return math.comb(n, r)
 
 class Skill:
 	def __init__(
@@ -187,9 +184,9 @@ class ClashRatesTrio:
 combined_power_probabilities_dict = {}
 
 
-def get_combined_power_probabilities(
-	power_probabilities1, power_probabilities2
-):
+def get_combined_power_probabilities(power_probabilities1, power_probabilities2):
+	global combined_power_probabilities_dict
+
 	key = (frozenset(power_probabilities1.items()), frozenset(power_probabilities2.items()))
 	if key in combined_power_probabilities_dict:
 		return combined_power_probabilities_dict[key]
@@ -251,6 +248,8 @@ power_probabilities_dict = {}
 
 
 def get_power_probabilities(skill):
+	global power_probabilities_dict
+
 	if skill.effective_rolling_id in power_probabilities_dict:
 		return power_probabilities_dict[skill.effective_rolling_id]
 	elif skill.reducible:
@@ -286,6 +285,8 @@ outcome_probabilities_dict = {}
 
 
 def get_parry_outcome_probabilities(skill1, skill2):
+	global outcome_probabilities_dict
+
 	effective_dynamic_key = (skill1.effective_rolling_id, skill2.effective_rolling_id)
 	if effective_dynamic_key in outcome_probabilities_dict:
 		return outcome_probabilities_dict[effective_dynamic_key]
@@ -319,6 +320,11 @@ clash_dict = {}
 
 
 def clash(skill1, skill2, parry):
+	global clash_dict
+	global combined_power_probabilities_dict
+	global power_probabilities_dict
+	global outcome_probabilities_dict
+	
 	dynamic_key = (skill1.dynamic_id, skill2.dynamic_id, parry)
 	if dynamic_key in clash_dict:
 		return clash_dict[dynamic_key]
@@ -365,6 +371,12 @@ def clash(skill1, skill2, parry):
 	+ parry_lose_clash_outcomes.lose_rates * parry_outcome_probabilities["lose"])
 	
 	result = ClashRatesTrio(win_rates=win_rates, tie_rates=tie_rates, lose_rates=lose_rates)
-
 	clash_dict[dynamic_key] = result
+
+	if parry == 0:
+		combined_power_probabilities_dict = {}
+		power_probabilities_dict = {}
+		outcome_probabilities_dict = {}
+		clash_dict = {}
+
 	return result
