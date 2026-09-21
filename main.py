@@ -182,18 +182,6 @@ class ClashRatesTrio:
 			self.lose_rates, 
 			self.tie_rates,
 			self.win_rates)
-	
-	def __add__(self, other):
-		return ClashRates(
-			self.win_rates + other.win_rates, 
-			self.tie_rates + other.tie_rates,
-			self.lose_rates + other.lose_rates)
-
-	def __mul__(self, other):
-		return ClashRates(
-			self.win_rates * other.win_rates, 
-			self.tie_rates * other.tie_rates,
-			self.lose_rates * other.lose_rates)
 
 
 combined_power_probabilities_dict = {}
