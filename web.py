@@ -5,7 +5,7 @@ from main import clash, Skill
 def calculate_clash(event=None):
 	try:
 		document.querySelector(".all-result-container").style.opacity = 0.5
-		
+
 		base_power_1 = int(document.querySelector("#base-power-1").value)
 		coin_power_1 = int(document.querySelector("#coin-power-1").value)
 		coin_count_1 = int(document.querySelector("#coin-count-1").value)
@@ -121,4 +121,3 @@ def toggle_circle_color(event):
 
 update_coins(id="coin-count-1")
 update_coins(id="coin-count-2")
-calculate_clash()
