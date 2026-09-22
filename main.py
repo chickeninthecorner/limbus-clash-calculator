@@ -336,7 +336,7 @@ def clash(skill1, skill2, parry):
 		return ClashRatesTrio(win_rates=ClashRates({skill1.intact_coin_count: 1.0}))
 	elif skill1.intact_coin_count == 0:
 		return ClashRatesTrio(lose_rates=ClashRates({skill2.intact_coin_count: 1.0}))
-	elif min(skill1.intact_coin_count, skill2.intact_coin_count) > parry - 99:
+	elif min(skill1.intact_coin_count, skill2.intact_coin_count) > 99 - parry:
 		return ClashRatesTrio(tie_rates=ClashRates({"overall": 1.0}))
 
 	parry_outcome_probabilities = get_parry_outcome_probabilities(
