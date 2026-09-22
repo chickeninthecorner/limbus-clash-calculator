@@ -5,7 +5,7 @@ from main import clash, Skill
 def calculate_clash(event=None):
 	try:
 		document.querySelector(".all-result-container").style.opacity = 0.5
-
+		
 		base_power_1 = int(document.querySelector("#base-power-1").value)
 		coin_power_1 = int(document.querySelector("#coin-power-1").value)
 		coin_count_1 = int(document.querySelector("#coin-count-1").value)
@@ -71,11 +71,36 @@ def calculate_clash(event=None):
 	except Exception as e:
 		document.querySelector("clash").innerHTML = "Something went wrong! Are your inputs valid?"
 
+
+def is_input_valid(selector_str, min=None, max=None):
+	query = document.querySelector(selector_str)
+
+	try:
+		num = int(query.value)
+		return (min is None or num >= min) and (max is None or num <= max)
+	except:
+		return False
+
+
 @when("click", ".circle-container")
 @when("input", "input")
 def undisable_button(event=None):
-	document.querySelector("button").disabled = False
+	inputs_to_check = [
+		is_input_valid("#base-power-1", min=0),
+		is_input_valid("#coin-count-1", min=1, max=50),
+		is_input_valid("#sanity-1", min=-50, max=50),
+		is_input_valid("#paralysis-1", min=0),
+		is_input_valid("#base-power-2", min=0),
+		is_input_valid("#coin-count-2", min=1, max=50),
+		is_input_valid("#sanity-2", min=-50, max=50),
+		is_input_valid("#paralysis-2", min=0),
+	]
+
 	document.querySelector(".all-result-container").style.opacity = 0.5
+	if False not in inputs_to_check:
+		document.querySelector("button").disabled = False
+	else:
+		document.querySelector("button").disabled = True
 
 
 @when("input", "#coin-count-1")
