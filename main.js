@@ -103,10 +103,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // Direct translation of `toggle_circle_color`
     function toggleCircleColor(event) {
         let clicked_element = event.target;
-        console.log(clicked_element)
         
         if (clicked_element.classList.contains("coin-button")) {
             if (clicked_element.classList.contains("normal")) {

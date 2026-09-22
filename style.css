@@ -85,11 +85,16 @@ body {
 	pointer-events: none;
 	height: 3.75rem;
 	width: 3.75rem;
-	transition: transform 0.2s;
 }
 
 .coin-button:hover img {
-  transform: scale(1.2); 
+	transition: transform 0.1s;
+	transform: scale(1.2);
+}
+
+.coin-button:active img {
+	transition: transform 0.0s;
+	transform: scale(0.8);
 }
 
 .all-result-container {
