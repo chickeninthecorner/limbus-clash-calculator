@@ -5,12 +5,12 @@ window.Module = {
     }
 };
 
+
 // Wait for the HTML to finish loading before trying to grab elements
 document.addEventListener("DOMContentLoaded", () => {
     
+
     // --- Helper Functions ---
-    
-    // Calculates the "overall_rate" by summing the values in the JSON rate object
     function sumRates(ratesObj) {
         let sum = 0;
         for (let val of Object.values(ratesObj)) {
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return sum;
     }
 
-    // Direct translation of your `is_input_valid` Python function
+
     function isInputValid(selectorStr, min, max) {
         const el = document.querySelector(selectorStr);
         if (!el || el.value.trim() === "") return false;
@@ -33,9 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return true;
     }
 
-    // --- UI Update Functions ---
 
-    // Direct translation of `undisable_button`
+    // --- UI Update Functions ---
     function undisableButton(event) {
         const inputsToCheck = [
             isInputValid("#base-power-1", 0, null),
@@ -51,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let resultContainer = document.querySelector(".all-result-container");
         if (resultContainer) resultContainer.style.opacity = "0.5";
         
-        let button = document.querySelector("button"); 
+        let button = document.querySelector("#clash"); 
         if (button) {
             if (inputsToCheck.includes(false)) {
                 button.disabled = true;
@@ -60,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     }
+
 
     // Direct translation of `update_coins`
     function updateCoins(event, passedId) {
@@ -73,15 +73,20 @@ document.addEventListener("DOMContentLoaded", () => {
             let coin_count_input = Math.min(Math.max(parseInt(inputElement.value, 10), 1), 50);
             let container = document.querySelector(id === "coin-count-1" ? "#circle-container-1" : "#circle-container-2");
             
-            let current_circles = container.querySelectorAll(".coin");
+            let current_circles = container.querySelectorAll(".coin-button");
             let current_count = current_circles.length;
 
             if (coin_count_input > current_count) {
                 let coins_to_add = coin_count_input - current_count;
                 for (let i = 0; i < coins_to_add; i++) {
-                    let new_coin = document.createElement("img");
-                    new_coin.src = "normal_coin.webp";
-                    new_coin.className = "coin normal";
+                    let new_coin = document.createElement("button");
+                    new_coin.className = "coin-button normal";
+                    new_coin.setAttribute("form", "")
+                    new_coin.innerHTML = '<img src="normal_coin.webp"></img>';
+                    new_coin.addEventListener("click", (e) => {
+                        toggleCircleColor(e);
+                        undisableButton(e); 
+                    });
                     container.appendChild(new_coin);
                 }
             } else if (coin_count_input < current_count) {
@@ -97,51 +102,52 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+
     // Direct translation of `toggle_circle_color`
     function toggleCircleColor(event) {
         let clicked_element = event.target;
+        console.log(clicked_element)
         
-        if (clicked_element.classList.contains("coin")) {
+        if (clicked_element.classList.contains("coin-button")) {
             if (clicked_element.classList.contains("normal")) {
-                clicked_element.src = "unbreakable_coin.webp";
-                clicked_element.className = "coin red";
+                clicked_element.innerHTML = '<img src="unbreakable_coin.webp"></img>';
+                clicked_element.className = "coin-button red";
             } else {
-                clicked_element.src = "normal_coin.webp";
-                clicked_element.className = "coin normal";
+                clicked_element.innerHTML = '<img src="normal_coin.webp"></img>';
+                clicked_element.className = "coin-button normal";
             }
         }
     }
 
-    // --- Core Calculation ---
 
-    // Direct translation of `calculate_clash`
+    // --- Core Calculation ---
     function calculateClash(event) {
         if (event) event.preventDefault();
 
         try {
             document.querySelector(".all-result-container").style.opacity = "0.5";
 
-            // Grab inputs for Skill 1
+            // Skill 1 inputs
             let base_power_1 = parseInt(document.querySelector("#base-power-1").value, 10);
             let coin_power_1 = parseInt(document.querySelector("#coin-power-1").value, 10);
             let sanity_1 = parseInt(document.querySelector("#sanity-1").value, 10);
             let paralysis_1 = parseInt(document.querySelector("#paralysis-1").value, 10);
             
             let coins_1_arr = [];
-            document.querySelector("#circle-container-1").querySelectorAll(".coin").forEach(coin => {
+            document.querySelector("#circle-container-1").querySelectorAll(".coin-button").forEach(coin => {
                 if (coin.classList.contains("normal")) coins_1_arr.push('N');
                 else if (coin.classList.contains("red")) coins_1_arr.push('R');
             });
             let coins_1 = coins_1_arr.join(""); 
 
-            // Grab inputs for Skill 2
+            // Skill 2 inputs
             let base_power_2 = parseInt(document.querySelector("#base-power-2").value, 10);
             let coin_power_2 = parseInt(document.querySelector("#coin-power-2").value, 10);
             let sanity_2 = parseInt(document.querySelector("#sanity-2").value, 10);
             let paralysis_2 = parseInt(document.querySelector("#paralysis-2").value, 10);
             
             let coins_2_arr = [];
-            document.querySelector("#circle-container-2").querySelectorAll(".coin").forEach(coin => {
+            document.querySelector("#circle-container-2").querySelectorAll(".coin-button").forEach(coin => {
                 if (coin.classList.contains("normal")) coins_2_arr.push('N');
                 else if (coin.classList.contains("red")) coins_2_arr.push('R');
             });
@@ -167,7 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
             winContainer.innerHTML = "";
             let winEntries = Object.entries(result.win_rates).reverse();
             for (let [key, value] of winEntries) {
-                if (key === "overall") continue; // Skip the "overall" key if present
+                if (key === "overall") continue;
                 let newLine = document.createElement("p");
                 newLine.innerHTML = `${key} intact coins left: ${(value * 100).toFixed(3)}%`;
                 winContainer.appendChild(newLine);
@@ -185,25 +191,24 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             // Disable button and reset opacity
-            let btn = document.querySelector("button");
-            if (btn) btn.disabled = true;
+            let btn = document.querySelector("#clash");
+            btn.disabled = true;
             document.querySelector(".all-result-container").style.opacity = "1";
 
         } catch (e) {
             console.error(e);
             let btn = document.querySelector("#clash");
-            if (btn) btn.innerHTML = "Something went wrong! Are your inputs valid?";
+            btn.innerHTML = "Something went wrong! Are your inputs valid?";
         }
     }
 
 
-    // --- Event Bindings (Replacing the @when PyScript decorators) ---
-
+    // --- Event Bindings --
     // 1. Clash Button
     let clashBtn = document.querySelector("#clash");
     if (clashBtn) clashBtn.addEventListener("click", calculateClash);
 
-    // 2. "@when('input', 'input')" - Trigger validation on any input typing
+    // 2. Input validation
     document.querySelectorAll("input").forEach(input => {
         input.addEventListener("input", undisableButton);
     });
@@ -215,8 +220,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let cc2 = document.querySelector("#coin-count-2");
     if (cc2) cc2.addEventListener("input", (e) => updateCoins(e, "coin-count-2"));
 
-    // 4. "@when('click', '.circle-container')" - Clicking circles toggles color AND checks validation
-    document.querySelectorAll(".circle-container").forEach(container => {
+    // 4. Clicking circles toggles color AND checks validation
+    document.querySelectorAll(".coin-button").forEach(container => {
         container.addEventListener("click", (e) => {
             toggleCircleColor(e);
             undisableButton(e); 
