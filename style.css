@@ -99,7 +99,8 @@ body {
 
 .all-result-container {
 	display: flex; 
-	justify-content:space-between ;
+	justify-content:space-between;
+	gap: 0.5rem;
 }
 
 .result-container {
@@ -108,7 +109,7 @@ body {
 	background-color: white;
 	padding: 1.25rem;
 	margin-bottom: 0.5rem;
-	width: 29%;
+	width: 33.4%;
 }
 
 .result-line-container {
