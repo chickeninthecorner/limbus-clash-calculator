@@ -332,9 +332,9 @@ def clash(skill1, skill2, parry):
 	if reversed_key in clash_dict:
 		return clash_dict[reversed_key].reversed_rates
 
-	if skill2.all_coin_count == 0:
+	if skill2.intact_coin_count == 0:
 		return ClashRatesTrio(win_rates=ClashRates({skill1.intact_coin_count: 1.0}))
-	elif skill1.all_coin_count == 0:
+	elif skill1.intact_coin_count == 0:
 		return ClashRatesTrio(lose_rates=ClashRates({skill2.intact_coin_count: 1.0}))
 	elif parry == 99:
 		return ClashRatesTrio(tie_rates=ClashRates({"overall": 1.0}))
