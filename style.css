@@ -24,27 +24,32 @@ body {
 .input-group {
 	display: flex; 
 	align-items: flex-end; 
-	gap: 0.94rem; 
+	gap: 1.25rem; 
 	font-size: 1.5rem; 
 	font-weight: bold;
-	flex-shrink: 0; /* Prevents the boxes from shrinking */
 }
 
 .input-box {
 	display: flex; 
 	flex-direction: column; 
-	align-items: center; 
+	align-items: center;
+	gap: 0.5rem;
 }
 
 .input-box label {
-	font-size: 14px; 
-	margin-bottom: 5px; 
+	display: flex;
+	font-size: 1rem; 
 	color: #555; 
 	font-weight: normal;
+	gap: 0.25rem;
+	text-align: center;
+	align-items: center;
+	height: 1.5rem;
+	max-width: 8rem;
 }
 
 .input-box input {
-	width: 4.38rem; 
+	width: 5rem; 
 	padding: 0.5rem; 
 	font-size: 1.25rem; 
 	text-align: center;
@@ -60,7 +65,7 @@ body {
 .equation_text {
 	padding-bottom: 0.31rem;
 	font-weight: normal;
-	color: lightgrey;
+	color: rgba(148, 148, 148, 1);
 }
 
 .circle-container {
@@ -101,6 +106,7 @@ body {
 	display: flex; 
 	justify-content:space-between;
 	gap: 0.5rem;
+	margin-bottom: 0.5rem;
 }
 
 .result-container {
@@ -108,7 +114,6 @@ body {
 	border-radius: 0.5rem;
 	background-color: white;
 	padding: 1.25rem;
-	margin-bottom: 0.5rem;
 	width: 33.4%;
 }
 
@@ -165,4 +170,9 @@ h2 {
 .result-container p {
 	margin-bottom: 0.375rem;
 	margin-top: 0.375rem;
+}
+
+.icon {
+	width: 1.5rem;
+	height: 1.5rem;
 }
