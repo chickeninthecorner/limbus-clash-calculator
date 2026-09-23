@@ -288,13 +288,17 @@ ParryOutcomes get_parry_outcome_probabilities(const Skill& skill1, const Skill& 
         return {rev_it->second.lose, rev_it->second.tie, rev_it->second.win};
     }
 
+    // A hacky solution to add final power modifier last
+    ProbMap FPM_1_PP = {{skill1.final_power_modifier, 1.0f}};
+    ProbMap FPM_2_PP = {{skill2.final_power_modifier, 1.0f}};
+
     ProbMap p1 = get_combined_power_probabilities(
         get_power_probabilities(skill1), 
-        get_power_probabilities(Skill(skill1.final_power_modifier, "N", 0, 0, 0, 0))
+        FPM_1_PP
     );
     ProbMap p2 = get_combined_power_probabilities(
         get_power_probabilities(skill2), 
-        get_power_probabilities(Skill(skill2.final_power_modifier, "N", 0, 0, 0, 0))
+        FPM_2_PP
     );
 
     ParryOutcomes result;
