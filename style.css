@@ -10,7 +10,7 @@ body {
 	background-color: white;
 	padding: 1.25rem;
 	margin-bottom: 0.5rem;
-	box-shadow: 0 1.88rem 2.5rem rgba(0,0,0,.1);
+	box-shadow: 0 2rem 1rem rgba(0,0,0,0.15);
 }
 
 .top-skill-container {
@@ -123,6 +123,7 @@ body {
 	background-color: white;
 	padding: 1.25rem;
 	width: 33.4%;
+	box-shadow: 0 1rem 1rem rgba(0,0,0,0.15);
 }
 
 .result-line-container {
