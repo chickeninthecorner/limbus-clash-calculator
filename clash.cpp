@@ -143,12 +143,13 @@ public:
     int coin_power;
     int sanity;
     int paralysis;
+    int final_power_modifier;
     
     int intact_coin_count;
     int all_coin_count;
 
-    Skill(int bp, const std::string& c, int cp, int s = 0, int p = 0)
-        : base_power(bp), coins(c), coin_power(cp), sanity(s), paralysis(p) {
+    Skill(int bp, const std::string& c, int cp, int s = 0, int p = 0, int fpm = 0)
+        : base_power(bp), coins(c), coin_power(cp), sanity(s), paralysis(p), final_power_modifier(fpm) {
         
         intact_coin_count = 0;
         int c_count = 0;
@@ -192,11 +193,11 @@ public:
             }
         }
         if (!broken) coins_after = "";
-        return Skill(base_power, coins_after, coin_power, sanity, std::max(paralysis - all_coin_count, 0));
+        return Skill(base_power, coins_after, coin_power, sanity, std::max(paralysis - all_coin_count, 0), final_power_modifier);
     }
 
     Skill next_skill() const {
-        return Skill(base_power, coins, coin_power, sanity, std::max(paralysis - all_coin_count, 0));
+        return Skill(base_power, coins, coin_power, sanity, std::max(paralysis - all_coin_count, 0), final_power_modifier);
     }
 };
 
@@ -265,7 +266,7 @@ ProbMap get_power_probabilities(const Skill& skill) {
 
     for (int head_count = 0; head_count <= skill.all_coin_count; ++head_count) {
         int tail_count = skill.all_coin_count - head_count;
-        int power = skill.base_power + skill.coin_power * head_count;
+        int power = std::max(skill.base_power + skill.coin_power * head_count, 0);
         
         float prob = std::pow(heads_prob, head_count) * 
                      std::pow(tails_prob, tail_count) * 
@@ -287,8 +288,15 @@ ParryOutcomes get_parry_outcome_probabilities(const Skill& skill1, const Skill& 
         return {rev_it->second.lose, rev_it->second.tie, rev_it->second.win};
     }
 
-    ProbMap p1 = get_power_probabilities(skill1);
-    ProbMap p2 = get_power_probabilities(skill2);
+    ProbMap p1 = get_combined_power_probabilities(
+        get_power_probabilities(skill1), 
+        get_power_probabilities(Skill(skill1.final_power_modifier, "N", 0, 0, 0, 0))
+    );
+    ProbMap p2 = get_combined_power_probabilities(
+        get_power_probabilities(skill2), 
+        get_power_probabilities(Skill(skill2.final_power_modifier, "N", 0, 0, 0, 0))
+    );
+
     ParryOutcomes result;
 
     for (const auto& kv1 : p1) {
@@ -368,8 +376,8 @@ std::string toJsonObj(const ClashRates& cr) {
 }
 
 std::string clash(
-    int bp1, std::string c1, int cp1, int s1, int p1,
-    int bp2, std::string c2, int cp2, int s2, int p2,
+    int bp1, std::string c1, int cp1, int s1, int p1, int fpm1,
+    int bp2, std::string c2, int cp2, int s2, int p2, int fpm2,
     int parry
 ) {
     init_comb();
@@ -381,8 +389,8 @@ std::string clash(
         std::unordered_map<ClashKey, ClashRatesTrio, ClashKeyHash>().swap(clash_dict);
     }
     
-    Skill skill1(bp1, c1, cp1, s1, p1);
-    Skill skill2(bp2, c2, cp2, s2, p2);
+    Skill skill1(bp1, c1, cp1, s1, p1, fpm1);
+    Skill skill2(bp2, c2, cp2, s2, p2, fpm2);
     
     ClashRatesTrio result = core_clash(skill1, skill2, parry);
 

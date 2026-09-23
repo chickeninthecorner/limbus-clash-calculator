@@ -40,11 +40,13 @@ document.addEventListener("DOMContentLoaded", () => {
             isInputValid("#base-power-1", 0, null),
             isInputValid("#coin-count-1", 1, 50),
             isInputValid("#sanity-1", -50, 50),
+            isInputValid("#final-power-modifier-1", null, null),
             isInputValid("#paralysis-1", 0, null),
             isInputValid("#base-power-2", 0, null),
             isInputValid("#coin-count-2", 1, 50),
             isInputValid("#sanity-2", -50, 50),
-            isInputValid("#paralysis-2", 0, null)
+            isInputValid("#paralysis-2", 0, null),
+            isInputValid("#final-power-modifier-2", null, null)
         ];
 
         let resultContainer = document.querySelector(".all-result-container");
@@ -130,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let coin_power_1 = parseInt(document.querySelector("#coin-power-1").value, 10);
             let sanity_1 = parseInt(document.querySelector("#sanity-1").value, 10);
             let paralysis_1 = parseInt(document.querySelector("#paralysis-1").value, 10);
+            let final_power_modifier_1 = parseInt(document.querySelector("#final-power-modifier-1").value, 10);
             
             let coins_1_arr = [];
             document.querySelector("#circle-container-1").querySelectorAll(".coin-button").forEach(coin => {
@@ -143,6 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let coin_power_2 = parseInt(document.querySelector("#coin-power-2").value, 10);
             let sanity_2 = parseInt(document.querySelector("#sanity-2").value, 10);
             let paralysis_2 = parseInt(document.querySelector("#paralysis-2").value, 10);
+            let final_power_modifier_2 = parseInt(document.querySelector("#final-power-modifier-2").value, 10);
             
             let coins_2_arr = [];
             document.querySelector("#circle-container-2").querySelectorAll(".coin-button").forEach(coin => {
@@ -153,8 +157,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Call the ultra-fast C++ WebAssembly module
             let jsonString = window.Module.clash(
-                base_power_1, coins_1, coin_power_1, sanity_1, paralysis_1,
-                base_power_2, coins_2, coin_power_2, sanity_2, paralysis_2,
+                base_power_1, coins_1, coin_power_1, sanity_1, paralysis_1, final_power_modifier_1,
+                base_power_2, coins_2, coin_power_2, sanity_2, paralysis_2, final_power_modifier_2,
                 0 // Starting parry
             );
 
