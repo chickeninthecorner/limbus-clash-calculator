@@ -24,9 +24,15 @@ body {
 .input-group {
 	display: flex; 
 	align-items: flex-end; 
+	flex-wrap: wrap;
 	gap: 1.25rem; 
-	font-size: 1.5rem; 
-	font-weight: bold;
+	row-gap: 1rem;
+}
+
+.input-subgroup {
+	display: flex; 
+	align-items: flex-end; 
+	gap: 1.25rem; 
 }
 
 .input-box {
@@ -60,12 +66,14 @@ body {
 .operator {
 	padding-bottom: 0.31rem;
 	color: #555;
+	font-weight: bold;
+	font-size: 1.5rem; 
 }
 
 .equation_text {
 	padding-bottom: 0.31rem;
-	font-weight: normal;
 	color: rgba(148, 148, 148, 1);
+	font-size: 1.5rem; 
 }
 
 .circle-container {
@@ -177,3 +185,4 @@ h2 {
 	width: 1.5rem;
 	height: 1.5rem;
 }
+
