@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
             {
                 let inputElement = document.querySelector("#" + id);
                 let coin_count_input = parseInt(inputElement.value, 10);
-                let container = document.querySelector(id === "coin-count-1" ? "#circle-container-1" : "#circle-container-2");
+                let container = document.querySelector(id === "coin-count-1" ? "#coin-button-container-1" : "#coin-button-container-2");
                 
                 let current_circles = container.querySelectorAll(".coin-button");
                 let current_count = current_circles.length;
@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let final_power_modifier_1 = parseInt(document.querySelector("#final-power-modifier-1").value, 10);
             
             let coins_1_arr = [];
-            document.querySelector("#circle-container-1").querySelectorAll(".coin-button").forEach(coin => {
+            document.querySelector("#coin-button-container-1").querySelectorAll(".coin-button").forEach(coin => {
                 if (coin.classList.contains("normal")) coins_1_arr.push('N');
                 else if (coin.classList.contains("red")) coins_1_arr.push('R');
             });
@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let final_power_modifier_2 = parseInt(document.querySelector("#final-power-modifier-2").value, 10);
             
             let coins_2_arr = [];
-            document.querySelector("#circle-container-2").querySelectorAll(".coin-button").forEach(coin => {
+            document.querySelector("#coin-button-container-2").querySelectorAll(".coin-button").forEach(coin => {
                 if (coin.classList.contains("normal")) coins_2_arr.push('N');
                 else if (coin.classList.contains("red")) coins_2_arr.push('R');
             });

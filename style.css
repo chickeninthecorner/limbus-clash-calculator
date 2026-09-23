@@ -21,7 +21,7 @@ body {
 	margin-top: 0rem;
 }
 
-.input-group {
+.input-container {
 	display: flex; 
 	align-items: flex-end; 
 	flex-wrap: wrap;
@@ -29,7 +29,7 @@ body {
 	row-gap: 1rem;
 }
 
-.input-subgroup {
+.input-subcontainer {
 	display: flex; 
 	align-items: flex-end; 
 	gap: 1.25rem; 
@@ -76,7 +76,7 @@ body {
 	font-size: 1.5rem; 
 }
 
-.circle-container {
+.coin-button-container {
 	display: flex; 
 	gap: 0.125rem;
 	flex-wrap: wrap;

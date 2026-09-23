@@ -20,11 +20,11 @@
 		<div class="section-container">
 			<div class="top-skill-container">
 				<h2>Sinner skill</h2>
-				<div class="circle-container" id="circle-container-1"></div>
+				<div class="coin-button-container" id="coin-button-container-1"></div>
 			</div>
 
-			<div class="input-group">
-				<div class="input-subgroup">
+			<div class="input-container">
+				<div class="input-subcontainer">
 					<div class="input-box">
 						<label for="base-power-1">
 							Base Power
@@ -51,7 +51,7 @@
 					</div>
 				</div>
 				
-				<div class="input-subgroup">
+				<div class="input-subcontainer">
 					<div class="equation_text">with</div>
 
 					<div class="input-box">
@@ -84,59 +84,63 @@
 		<div class="section-container">
 			<div class="top-skill-container">
 				<h2>Enemy skill</h2>
-				<div class="circle-container" id="circle-container-2"></div>
+				<div class="coin-button-container" id="coin-button-container-2"></div>
 			</div>
 
-			<div class="input-group">
-				<div class="input-box">
-					<label for="base-power-2">
-						Base Power
-					</label>
-					<input type="number" id="base-power-2" value="5" min="1" required>
-				</div>
-				
-				<div class="operator">+</div>
-				
-				<div class="input-box">
-					<label for="coin-power-2">
-						Coin Power
-					</label>
-					<input type="number" id="coin-power-2" value="3" required autocomplete="off" >
-				</div>
-				
-				<div class="operator">&#215;</div>
-				
-				<div class="input-box">
-					<label for="coin-count-2">
-						Coins
-					</label>
-					<input type="number" id="coin-count-2" value="2" min="1" max="50" required autocomplete="off" >
+			<div class="input-container">
+				<div class="input-subcontainer">
+					<div class="input-box">
+						<label for="base-power-2">
+							Base Power
+						</label>
+						<input type="number" id="base-power-2" value="5" min="1" required>
+					</div>
+					
+					<div class="operator">+</div>
+					
+					<div class="input-box">
+						<label for="coin-power-2">
+							Coin Power
+						</label>
+						<input type="number" id="coin-power-2" value="3" required autocomplete="off" >
+					</div>
+					
+					<div class="operator">&#215;</div>
+					
+					<div class="input-box">
+						<label for="coin-count-2">
+							Coins
+						</label>
+						<input type="number" id="coin-count-2" value="2" min="1" max="50" required autocomplete="off" >
+					</div>
 				</div>
 
 				<div class="equation_text">with</div>
 				
-				<div class="input-box">
-					<label for="sanity-2">
-						Sanity
-						<img src="sanity.webp" class="icon">
-					</label>
-					<input type="number" id="sanity-2" value="0" min="-50" max="50" required autocomplete="off" >
-				</div>
+				<div class="input-subcontainer">
+					<div class="input-box">
+						<label for="sanity-2">
+							Sanity
+							<img src="sanity.webp" class="icon">
+						</label>
+						<input type="number" id="sanity-2" value="0" min="-50" max="50" required autocomplete="off" >
+					</div>
 
-				<div class="input-box">
-					<label for="final-power-modifier-2">
-						Final Power Modifier
-						<img src="clash_power_up.webp" class="icon">
-					</label>
-					<input type="number" id="final-power-modifier-2" value="0" required autocomplete="off" >
-				</div>
+					<div class="input-box">
+						<label for="final-power-modifier-2">
+							Final Power Modifier
+							<img src="clash_power_up.webp" class="icon">
+						</label>
+						<input type="number" id="final-power-modifier-2" value="0" required autocomplete="off" >
+					</div>
 
-				<div class="input-box">
-					<label for="paralysis-2">
-						Paralysis
-						<img src="paralysis.webp" class="icon">
-					</label>
-					<input type="number" id="paralysis-2" value="0" min="0" required autocomplete="off">
+					<div class="input-box">
+						<label for="paralysis-2">
+							Paralysis
+							<img src="paralysis.webp" class="icon">
+						</label>
+						<input type="number" id="paralysis-2" value="0" min="0" required autocomplete="off">
+					</div>
 				</div>
 			</div>
 		</div>
