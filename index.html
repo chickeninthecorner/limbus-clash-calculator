@@ -8,8 +8,12 @@
 <html>
 	<body>
 		<h1>Limbus Clash Calculator</h1>
-		<p>Welcome to this clash calculator! Simply scroll down and key in the relevant information and click clash.</p>
-		<p>Red coins are supported. Toggle the type of coin by clicking on it.</p>
+		<p>
+			Welcome to this clash calculator! Simply scroll down and key in the relevant information and click clash.
+		</p>
+		<p>
+			Red coins are supported. Toggle the type of coin by clicking on it. In addition, sanity can be set from -50 to 50.
+		</p>
 		<p>Visit the <a href="https://github.com/chickeninthecorner/limbus-clash-calculator">github</a> here.</p>
 		
 		<form>
@@ -149,8 +153,13 @@
 					<h2>Tie Rate:</h2>
 					<h2 id="tie-rate">-<h2>
 				</div>
-				<p>A tie is triggered if a clash has no winner after 99 parries.</p>
-				<p>The final power of a skill will always be at least zero.</p>
+				<p>
+					This calculator considers a tie occuring if there is no winner after the 99th parry.
+				</p>
+				<p>
+					Base power cannot be negative, and power cannot be below 0.
+					Final power is added after all coins.
+				</p>
 			</div>
 			
 			<div class="result-container">

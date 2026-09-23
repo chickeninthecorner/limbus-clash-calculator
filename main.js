@@ -70,32 +70,35 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!id) return;
             
             let inputElement = document.querySelector("#" + id);
-            if (!inputElement || inputElement.value === "") return;
-            
-            let coin_count_input = Math.min(Math.max(parseInt(inputElement.value, 10), 1), 50);
-            let container = document.querySelector(id === "coin-count-1" ? "#circle-container-1" : "#circle-container-2");
-            
-            let current_circles = container.querySelectorAll(".coin-button");
-            let current_count = current_circles.length;
 
-            if (coin_count_input > current_count) {
-                let coins_to_add = coin_count_input - current_count;
-                for (let i = 0; i < coins_to_add; i++) {
-                    let new_coin = document.createElement("button");
-                    new_coin.className = "coin-button normal";
-                    new_coin.setAttribute("form", "")
-                    new_coin.innerHTML = '<img src="normal_coin.webp"></img>';
-                    new_coin.addEventListener("click", (e) => {
-                        toggleCircleColor(e);
-                        undisableButton(e); 
-                    });
-                    container.appendChild(new_coin);
-                }
-            } else if (coin_count_input < current_count) {
-                let coins_to_remove = current_count - coin_count_input;
-                for (let i = 0; i < coins_to_remove; i++) {
-                    if (container.lastElementChild) {
-                        container.lastElementChild.remove();
+            if (isInputValid("#" + id, 1, 50))
+            {
+                let inputElement = document.querySelector("#" + id);
+                let coin_count_input = parseInt(inputElement.value, 10);
+                let container = document.querySelector(id === "coin-count-1" ? "#circle-container-1" : "#circle-container-2");
+                
+                let current_circles = container.querySelectorAll(".coin-button");
+                let current_count = current_circles.length;
+
+                if (coin_count_input > current_count) {
+                    let coins_to_add = coin_count_input - current_count;
+                    for (let i = 0; i < coins_to_add; i++) {
+                        let new_coin = document.createElement("button");
+                        new_coin.className = "coin-button normal";
+                        new_coin.setAttribute("form", "")
+                        new_coin.innerHTML = '<img src="normal_coin.webp"></img>';
+                        new_coin.addEventListener("click", (e) => {
+                            toggleCircleColor(e);
+                            undisableButton(e); 
+                        });
+                        container.appendChild(new_coin);
+                    }
+                } else if (coin_count_input < current_count) {
+                    let coins_to_remove = current_count - coin_count_input;
+                    for (let i = 0; i < coins_to_remove; i++) {
+                        if (container.lastElementChild) {
+                            container.lastElementChild.remove();
+                        }
                     }
                 }
             }
