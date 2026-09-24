@@ -66,15 +66,16 @@ struct IDState {
     int base, cp, sanity, p;
     char num_coins;
     char coins[55];
+    int fpm;
 
-    IDState(int b, int c, int s, int p_, const std::string& str) {
-        base = b; cp = c; sanity = s; p = p_;
+    IDState(int b, int c, int s, int p_, const std::string& str, int fpm_) {
+        base = b; cp = c; sanity = s; p = p_; fpm = fpm_;
         num_coins = std::min((int)str.length(), 55);
         for(int i = 0; i < num_coins; ++i) coins[i] = str[i];
     }
 
     bool operator==(const IDState& o) const {
-        if (base != o.base || cp != o.cp || sanity != o.sanity || p != o.p || num_coins != o.num_coins) return false;
+        if (base != o.base || cp != o.cp || sanity != o.sanity || p != o.p || num_coins != o.num_coins || fpm != o.fpm) return false;
         for(int i = 0; i < num_coins; ++i) {
             if (coins[i] != o.coins[i]) return false;
         }
@@ -89,6 +90,7 @@ struct IDHash {
         hash_combine(seed, std::hash<int>()(t.cp));
         hash_combine(seed, std::hash<int>()(t.sanity));
         hash_combine(seed, std::hash<int>()(t.p));
+        hash_combine(seed, std::hash<int>()(t.fpm));
         
         std::size_t coin_hash = 0;
         for(int i = 0; i < t.num_coins; ++i) coin_hash = coin_hash * 31 + t.coins[i];
@@ -169,14 +171,14 @@ public:
     }
 
     IDState dynamic_id() const {
-        return IDState(base_power, coin_power, sanity, paralysis, coins);
+        return IDState(base_power, coin_power, sanity, paralysis, coins, final_power_modifier);
     }
 
     IDState effective_rolling_id() const {
         std::string eff_coins = "";
         eff_coins.reserve(coins.size());
         for (char ch : coins) eff_coins += (ch == 'C') ? 'C' : 'N';
-        return IDState(base_power, coin_power, sanity, std::min(paralysis, all_coin_count), eff_coins);
+        return IDState(base_power, coin_power, sanity, std::min(paralysis, all_coin_count), eff_coins, final_power_modifier);
     }
 
     Skill lose_skill() const {
