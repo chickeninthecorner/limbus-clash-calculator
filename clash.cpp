@@ -26,11 +26,10 @@ void init_comb() {
     comb_init = true;
 }
 
-// --- Memory-Optimized Structs ---
 struct ClashRates {
     float rates[55] = {0.0f}; 
 
-    void add_mul(const ClashRates& other, float multiplier) {
+    void add_mul(const ClashRates& other, const float multiplier) {
         for (int i = 0; i < 55; ++i) {
             rates[i] += other.rates[i] * multiplier;
         }
@@ -131,7 +130,7 @@ struct ClashKeyHash {
     }
 };
 
-// --- Global Dicts ---
+// Memoization dicts
 using ProbMap = std::unordered_map<int, float>;
 std::unordered_map<IDState, ProbMap, IDHash> power_probabilities_dict;
 std::unordered_map<ParryKey, ParryOutcomes, ParryKeyHash> outcome_probabilities_dict;
@@ -340,7 +339,7 @@ ParryOutcomes get_parry_outcome_probabilities(const Skill& skill1, const Skill& 
     return result;
 }
 
-ClashRatesTrio core_clash(const Skill& skill1, const Skill& skill2, int parry) {
+ClashRatesTrio core_clash(const Skill& skill1, const Skill& skill2, const int parry) {
     ClashKey dynamic_key = {skill1.dynamic_id(), skill2.dynamic_id(), parry};
 
     auto it = clash_dict.find(dynamic_key);
@@ -414,7 +413,6 @@ std::string clash(
 ) {
     init_comb();
     
-    // Memory Swap Trick to keep Wasm RAM at absolute minimum
     if (parry == 0) {
         std::unordered_map<IDState, ProbMap, IDHash>().swap(power_probabilities_dict);
         std::unordered_map<ParryKey, ParryOutcomes, ParryKeyHash>().swap(outcome_probabilities_dict);
