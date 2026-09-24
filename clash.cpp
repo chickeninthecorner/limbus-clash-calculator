@@ -163,7 +163,7 @@ public:
     bool reducible() const {
         if (base_power > 0 && coin_power > 0) return true;
         if (paralysis > 0) return true;
-        if (coins.find('S') != std::string::npos) return true;
+        if (coins.find('C') != std::string::npos) return true;
         return false;
     }
 
@@ -215,7 +215,7 @@ ProbMap get_combined_power_probabilities(const ProbMap& p1, const ProbMap& p2) {
 
 ProbMap get_power_probabilities(const Skill& skill);
 
-ProbMap sum_reduced_rolling_components(const Skill& skill) {
+ProbMap sum_reduced_rolling_components(const Skill& skill, bool) {
     int paralysis = skill.paralysis;
     int last_cp = 0;
     bool has_last = false;
