@@ -185,6 +185,7 @@ public:
         std::string coins_after = coins;
         bool broken = false;
         
+        // Tries to break the lastmost coin after the 1st coin
         for (int i = all_coin_count - 1; i > 0; --i) {
             if (coins_after[i] == 'N') {
                 coins_after.erase(i, 1);
@@ -195,6 +196,7 @@ public:
                 broken = true; break;
             }
         }
+        // Completely destroy all coins if the 1st coin is the only intact coin
         if (!broken) coins_after = "";
         return Skill(base_power, coins_after, coin_power, sanity, std::max(paralysis - all_coin_count, 0), final_power_modifier);
     }
@@ -210,14 +212,14 @@ ProbMap get_combined_power_probabilities(const ProbMap& p1, const ProbMap& p2) {
     ProbMap result;
     for (const auto& kv1 : p1) {
         for (const auto& kv2 : p2) {
-            int combined = std::max(kv1.first + kv2.first, 0);
+            int combined = kv1.first + kv2.first;
             result[combined] += kv1.second * kv2.second;
         }
     }
     return result;
 }
 
-ProbMap get_power_probabilities(const Skill& skill, bool allow_negative);
+ProbMap get_power_probabilities(const Skill& skill);
 
 // Main function to break down complicated skills to simpler ones
 ProbMap sum_reduced_rolling_components(const Skill& skill) {
@@ -227,7 +229,7 @@ ProbMap sum_reduced_rolling_components(const Skill& skill) {
     int consecutive = 0;
 
     // Treat the base power as a separate skill
-    ProbMap result = get_power_probabilities(Skill(skill.base_power, "N", 0, 0, 0), false);
+    ProbMap result = get_power_probabilities(Skill(skill.base_power, "N", 0, 0, 0));
 
     // Track the number of consecutive coins with the same coin power
     // If the coin power changes, add to the power probabilities of result
@@ -242,10 +244,8 @@ ProbMap sum_reduced_rolling_components(const Skill& skill) {
             consecutive++;
         } else {
             result = get_combined_power_probabilities(
-                result, get_power_probabilities(
-                    // Allow negative coins to generate negative keys in power probabilities
-                    Skill(0, std::string(consecutive, 'N'), last_cp, skill.sanity, 0), true
-                )
+                result,
+                get_power_probabilities(Skill(0, std::string(consecutive, 'N'), last_cp, skill.sanity, 0))
             );
             consecutive = 1; last_cp = eff_cp;
         }
@@ -254,13 +254,15 @@ ProbMap sum_reduced_rolling_components(const Skill& skill) {
 
     if (has_last) {
         result = get_combined_power_probabilities(
-            result, get_power_probabilities(Skill(0, std::string(consecutive, 'N'), last_cp, skill.sanity, 0), true)
+            result,
+            get_power_probabilities(Skill(0, std::string(consecutive, 'N'), last_cp, skill.sanity, 0))
         );
     }
+
     return result;
 }
 
-ProbMap get_power_probabilities(const Skill& skill, const bool allow_negative) {
+ProbMap get_power_probabilities(const Skill& skill) {
     IDState eff_id = skill.effective_rolling_id();
     auto it = power_probabilities_dict.find(eff_id);
     if (it != power_probabilities_dict.end()) return it->second;
@@ -279,18 +281,23 @@ ProbMap get_power_probabilities(const Skill& skill, const bool allow_negative) {
         int tail_count = skill.all_coin_count - head_count;
         int power = skill.base_power + skill.coin_power * head_count;
         
-        // Used for negative coin skills that are part of a reducible skill
-        if(!allow_negative) {
-            power = std::max(power, 0);
-        }
-        
         float prob = std::pow(heads_prob, head_count) * 
                      std::pow(tails_prob, tail_count) * 
                      (float)comb_cache[skill.all_coin_count][head_count];
         result[power] += prob;
     }
+
     power_probabilities_dict[eff_id] = result;
     return result;
+}
+
+ProbMap clamp_to_zero(const ProbMap& raw_map) {
+    ProbMap clamped_map;
+    for (const auto& kv : raw_map) {
+        int final_power = std::max(kv.first, 0);
+        clamped_map[final_power] += kv.second;
+    }
+    return clamped_map;
 }
 
 ParryOutcomes get_parry_outcome_probabilities(const Skill& skill1, const Skill& skill2) {
@@ -307,15 +314,18 @@ ParryOutcomes get_parry_outcome_probabilities(const Skill& skill1, const Skill& 
     // A hacky solution to add final power modifier last
     ProbMap FPM_1_PP = {{skill1.final_power_modifier, 1.0f}};
     ProbMap FPM_2_PP = {{skill2.final_power_modifier, 1.0f}};
-    ProbMap p1 = get_combined_power_probabilities(
-        get_power_probabilities(skill1, false), 
-        FPM_1_PP
+    ProbMap p1 = clamp_to_zero(
+        get_combined_power_probabilities(
+            clamp_to_zero(get_power_probabilities(skill1)), 
+            FPM_1_PP
+        )
     );
-    ProbMap p2 = get_combined_power_probabilities(
-        get_power_probabilities(skill2, false), 
-        FPM_2_PP
+    ProbMap p2 = clamp_to_zero(
+        get_combined_power_probabilities(
+            clamp_to_zero(get_power_probabilities(skill2)), 
+            FPM_2_PP
+        )
     );
-
     ParryOutcomes result;
 
     for (const auto& kv1 : p1) {
