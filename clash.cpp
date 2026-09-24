@@ -160,6 +160,7 @@ public:
         all_coin_count = intact_coin_count + c_count;
     }
 
+    // Check if the skill can be simplified into one or more skills
     bool reducible() const {
         if (base_power > 0 && coin_power > 0) return true;
         if (paralysis > 0) return true;
@@ -201,7 +202,8 @@ public:
     }
 };
 
-// --- Core Logic ---
+// Combine the power probabilities from 2 different skills
+// Used for base power + coin sequence 1 + coin sequence 2 + ... + final power modifier
 ProbMap get_combined_power_probabilities(const ProbMap& p1, const ProbMap& p2) {
     ProbMap result;
     for (const auto& kv1 : p1) {
@@ -215,14 +217,18 @@ ProbMap get_combined_power_probabilities(const ProbMap& p1, const ProbMap& p2) {
 
 ProbMap get_power_probabilities(const Skill& skill, bool allow_negative);
 
+// Main function to break down complicated skills to simpler ones
 ProbMap sum_reduced_rolling_components(const Skill& skill) {
     int paralysis = skill.paralysis;
     int last_cp = 0;
     bool has_last = false;
     int consecutive = 0;
 
+    // Treat the base power as a separate skill
     ProbMap result = get_power_probabilities(Skill(skill.base_power, "N", 0, 0, 0), false);
 
+    // Track the number of consecutive coins with the same coin power
+    // If the coin power changes, add to the power probabilities of result
     for (char coin : skill.coins) {
         int eff_cp = skill.coin_power;
         if (paralysis > 0) eff_cp = 0;
@@ -234,7 +240,10 @@ ProbMap sum_reduced_rolling_components(const Skill& skill) {
             consecutive++;
         } else {
             result = get_combined_power_probabilities(
-                result, get_power_probabilities(Skill(0, std::string(consecutive, 'N'), last_cp, skill.sanity, 0), true)
+                result, get_power_probabilities(
+                    // Allow negative coins to generate negative keys in power probabilities
+                    Skill(0, std::string(consecutive, 'N'), last_cp, skill.sanity, 0), true
+                )
             );
             consecutive = 1; last_cp = eff_cp;
         }
@@ -267,7 +276,8 @@ ProbMap get_power_probabilities(const Skill& skill, const bool allow_negative) {
     for (int head_count = 0; head_count <= skill.all_coin_count; ++head_count) {
         int tail_count = skill.all_coin_count - head_count;
         int power = skill.base_power + skill.coin_power * head_count;
-
+        
+        // Used for negative coin skills that are part of a reducible skill
         if(!allow_negative) {
             power = std::max(power, 0);
         }
@@ -295,7 +305,6 @@ ParryOutcomes get_parry_outcome_probabilities(const Skill& skill1, const Skill& 
     // A hacky solution to add final power modifier last
     ProbMap FPM_1_PP = {{skill1.final_power_modifier, 1.0f}};
     ProbMap FPM_2_PP = {{skill2.final_power_modifier, 1.0f}};
-
     ProbMap p1 = get_combined_power_probabilities(
         get_power_probabilities(skill1, false), 
         FPM_1_PP
@@ -336,8 +345,11 @@ ClashRatesTrio core_clash(const Skill& skill1, const Skill& skill2, int parry) {
     } else if (skill1.all_coin_count == 0) {
         if(skill2.intact_coin_count < 55) res.lose.rates[skill2.intact_coin_count] = 1.0f;
         return res;
-    } else if (std::min(skill1.intact_coin_count, skill2.intact_coin_count) > 99 - parry) {
-        res.tie.rates[0] = 1.0f; // Index 0 represents "overall"
+    } else if (
+        // Instantly tie any clashes that are doomed to tie
+        std::min(skill1.intact_coin_count, skill2.intact_coin_count) > 99 - parry
+    ) {
+        res.tie.rates[0] = 1.0f; // Overall
         return res;
     }
 
