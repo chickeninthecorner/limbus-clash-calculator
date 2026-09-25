@@ -290,15 +290,6 @@ ProbMap get_power_probabilities(const Skill& skill) {
     return result;
 }
 
-ProbMap clamp_to_zero(const ProbMap& raw_map) {
-    ProbMap clamped_map;
-    for (const auto& kv : raw_map) {
-        int final_power = std::max(kv.first, 0);
-        clamped_map[final_power] += kv.second;
-    }
-    return clamped_map;
-}
-
 ParryOutcomes get_parry_outcome_probabilities(const Skill& skill1, const Skill& skill2) {
     ParryKey key = {skill1.effective_rolling_id(), skill2.effective_rolling_id()};
     auto it = outcome_probabilities_dict.find(key);
@@ -310,28 +301,23 @@ ParryOutcomes get_parry_outcome_probabilities(const Skill& skill1, const Skill& 
         return {rev_it->second.lose, rev_it->second.tie, rev_it->second.win};
     }
 
-    // A hacky solution to add final power modifier last
-    ProbMap FPM_1_PP = {{skill1.final_power_modifier, 1.0f}};
-    ProbMap FPM_2_PP = {{skill2.final_power_modifier, 1.0f}};
-    ProbMap p1 = clamp_to_zero(
-        get_combined_power_probabilities(
-            clamp_to_zero(get_power_probabilities(skill1)), 
-            FPM_1_PP
-        )
-    );
-    ProbMap p2 = clamp_to_zero(
-        get_combined_power_probabilities(
-            clamp_to_zero(get_power_probabilities(skill2)), 
-            FPM_2_PP
-        )
-    );
+    ProbMap p1 = get_power_probabilities(skill1);
+    ProbMap p2 = get_power_probabilities(skill2);
     ParryOutcomes result;
 
     for (const auto& kv1 : p1) {
         for (const auto& kv2 : p2) {
             float prob = kv1.second * kv2.second;
-            if (kv1.first > kv2.first) result.win += prob;
-            else if (kv1.first < kv2.first) result.lose += prob;
+            int effective_power_1 = std::max(
+                std::max(kv1.first, 0) + skill1.final_power_modifier,
+                0
+            );
+            int effective_power_2 = std::max(
+                std::max(kv2.first, 0) + skill2.final_power_modifier,
+                0
+            );
+            if (effective_power_1 > effective_power_2) result.win += prob;
+            else if (effective_power_1 < effective_power_2) result.lose += prob;
             else result.tie += prob;
         }
     }
