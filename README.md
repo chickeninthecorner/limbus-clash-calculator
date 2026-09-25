@@ -6,7 +6,7 @@ Access it [here](https://chickeninthecorner.github.io/limbus-clash-calculator/).
 
 ![](https://github.com/user-attachments/assets/10fd89b4-199b-45e3-aacd-848daf49bda9)
 
-This project was originally built with Python and [Pyscript](https://github.com/pyscript/pyscript). AI was only used in translating this project to convert Python to C++ and Javacript to significantly improve performance.
+This project was originally built with Python and [Pyscript](https://github.com/pyscript/pyscript). AI was only used in translating this project to convert Python to C++ and Javacript to significantly improve performance. All changes after are not AI generated.
 
 To compile the C++ code using [Emscripten](https://github.com/emscripten-core/emscripten):
 ```
