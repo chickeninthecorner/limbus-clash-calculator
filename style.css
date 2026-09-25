@@ -173,10 +173,6 @@ body {
 	box-shadow: 0 0.5rem 0.63rem rgba(0, 0, 0, 0.1);
 }
 
-button:disabled {
-	opacity: 0.5;
-}
-
 h2 {
 	flex-shrink: 0;
 	margin-bottom: 0rem;
@@ -193,3 +189,7 @@ h2 {
 	height: 1.5rem;
 }
 
+button:disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
