@@ -124,6 +124,8 @@ body {
 	padding: 1.25rem;
 	width: 33.4%;
 	box-shadow: 0 1rem 1rem rgba(0,0,0,0.1);
+	height: 13rem;
+	overflow: auto;
 }
 
 #clash {
@@ -132,7 +134,7 @@ body {
 
 .result-line-container {
 	overflow: auto;
-	height: 10rem;
+	height: 8rem;
 }
 
 #win-rate {
